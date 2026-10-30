@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { budgetStatus, monthTotals, monthTransactions, pouchUsage, unlimitedSpending } from "./budget";
+import {
+  budgetBarText,
+  budgetStatus,
+  filledSegments,
+  monthTotals,
+  monthTransactions,
+  pouchUsage,
+  unlimitedSpending,
+} from "./budget";
 import { createStarterData } from "./starterData";
 import type { Category, EntryType, Transaction } from "./types";
 
@@ -99,5 +107,34 @@ describe("unlimitedSpending", () => {
     ]);
     expect(result.find((r) => r.category.id === "tavern")?.spentCents).toBe(875);
     expect(result.find((r) => r.category.id === "travel")?.spentCents).toBe(0);
+  });
+});
+
+describe("filledSegments", () => {
+  it("fills 10 segments in proportion, rounding to the nearest one", () => {
+    expect(filledSegments(0, 10000)).toBe(0);
+    expect(filledSegments(4500, 10000)).toBe(5); // 4.5 rounds up
+    expect(filledSegments(8000, 10000)).toBe(8);
+    expect(filledSegments(10000, 10000)).toBe(10);
+  });
+
+  it("never fills more than 10, even when over the limit", () => {
+    expect(filledSegments(11240, 10000)).toBe(10);
+  });
+});
+
+describe("budgetBarText", () => {
+  function usageFor(spentCents: number) {
+    const transactions = spentCents > 0 ? [entry("expense", spentCents, "2026-10-03", "provisions")] : [];
+    return pouchUsage(pouches, transactions, "2026-10")[0];
+  }
+
+  it("spells out spent, limit and what's left", () => {
+    expect(budgetBarText(usageFor(4500))).toBe("$45.00 of $100.00 used · $55.00 left");
+    expect(budgetBarText(usageFor(10000))).toBe("$100.00 of $100.00 used · $0.00 left");
+  });
+
+  it("says how far over, without a minus sign", () => {
+    expect(budgetBarText(usageFor(11240))).toBe("Over by $12.40");
   });
 });

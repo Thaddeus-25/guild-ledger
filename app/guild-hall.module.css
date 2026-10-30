@@ -1,0 +1,48 @@
+/* Three summary cards: stacked on phones, side by side on wider screens. */
+.cards {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 760px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Pouch limits and "No limit set": side by side on wide screens. */
+.columns {
+  display: grid;
+  margin-top: 12px;
+}
+
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 3fr 2fr;
+    gap: 16px;
+    align-items: start;
+  }
+}
+
+.unlimited {
+  list-style: none;
+}
+
+.unlimited li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 2px dashed var(--parchment-dark);
+}
+
+.spent {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.more {
+  margin-top: 12px;
+}

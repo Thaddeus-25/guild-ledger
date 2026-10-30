@@ -2,6 +2,7 @@
 // out from the saved entries; none of it is ever stored.
 
 import { monthOf } from "./dates";
+import { formatCents } from "./money";
 import type { Category, Transaction } from "./types";
 
 // The entries dated in one month, e.g. "2026-10".
@@ -86,4 +87,19 @@ export function unlimitedSpending(
       category,
       spentCents: spentInPouch(transactions, category.id, month),
     }));
+}
+
+// ---------- Budget bar helpers ----------
+
+export const BAR_SEGMENTS = 10;
+
+// How many of the bar's 10 segments to fill. Capped at 10 when over.
+export function filledSegments(spentCents: number, limitCents: number): number {
+  return Math.min(BAR_SEGMENTS, Math.round((spentCents * BAR_SEGMENTS) / limitCents));
+}
+
+// The words under a budget bar, so the meaning never depends on color.
+export function budgetBarText(usage: PouchUsage): string {
+  if (usage.status === "over") return `Over by ${formatCents(-usage.leftCents)}`;
+  return `${formatCents(usage.spentCents)} of ${formatCents(usage.limitCents)} used · ${formatCents(usage.leftCents)} left`;
 }

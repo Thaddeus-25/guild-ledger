@@ -1,0 +1,53 @@
+.row {
+  padding: 10px 0;
+  border-bottom: 2px dashed var(--parchment-dark);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+/* 10 equal segments in a dark frame. */
+.bar {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--px);
+  padding: var(--px);
+  background: var(--wood-dark);
+}
+
+.segment,
+.filled {
+  height: 16px;
+  background: var(--parchment-dark);
+}
+
+/* The fill color depends on the status class on the bar. */
+.under .filled,
+.near .filled {
+  background: var(--moss);
+}
+
+.at .filled {
+  background: var(--gold);
+}
+
+.over .filled {
+  background: var(--amber);
+}
+
+.text {
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.overText {
+  font-weight: 700;
+}
