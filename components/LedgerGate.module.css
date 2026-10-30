@@ -1,0 +1,27 @@
+.loading {
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.25rem;
+  color: var(--gold);
+  padding: 48px 0;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--amber);
+  color: var(--ink);
+  border: var(--px) solid var(--wood-dark);
+}

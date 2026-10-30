@@ -64,6 +64,39 @@ a {
   outline-offset: 2px;
 }
 
+/* ---------- Buttons ---------- */
+/* Use className="button" on a <button> or a <Link>. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: var(--px);
+  padding: 8px 16px;
+  border: none;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-pixel), monospace;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  /* The same notched pixel border as the panels, plus a darker bottom edge. */
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--wood-dark),
+    0 var(--px) 0 0 var(--wood-dark),
+    calc(var(--px) * -1) 0 0 0 var(--wood-dark),
+    var(--px) 0 0 0 var(--wood-dark),
+    inset 0 calc(var(--px) * -1) 0 0 rgb(0 0 0 / 0.2);
+}
+
+.button:hover {
+  filter: brightness(1.08);
+}
+
+.button-quiet {
+  background: var(--parchment-dark);
+}
+
 /* ---------- Page layout ---------- */
 .page {
   max-width: 960px;

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Next, Pixelify_Sans } from "next/font/google";
+import LedgerGate from "@/components/LedgerGate";
 import NavBar from "@/components/NavBar";
+import { LedgerProvider } from "@/lib/LedgerContext";
 import "./globals.css";
 
 // Pixel font for headings and tabs.
@@ -24,8 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${pixelFont.variable} ${bodyFont.variable}`}>
       <body>
-        <NavBar />
-        <main className="page">{children}</main>
+        <LedgerProvider>
+          <NavBar />
+          <main className="page">
+            <LedgerGate>{children}</LedgerGate>
+          </main>
+        </LedgerProvider>
       </body>
     </html>
   );
