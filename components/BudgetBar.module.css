@@ -29,6 +29,24 @@
   background: var(--parchment-dark);
 }
 
+/* Filled segments pop in one after another (each gets a later
+   animation-delay from BudgetBar.tsx). steps() keeps it choppy and pixel-like.
+   Turned off for people who ask for reduced motion (see globals.css). */
+.filled {
+  animation: fill-in 240ms steps(3) both;
+}
+
+@keyframes fill-in {
+  from {
+    opacity: 0;
+    transform: scaleY(0.25);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* The fill color depends on the status class on the bar. */
 .under .filled,
 .near .filled {

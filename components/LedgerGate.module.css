@@ -25,3 +25,7 @@
   color: var(--ink);
   border: var(--px) solid var(--wood-dark);
 }
+
+.banner :focus-visible {
+  outline-color: var(--ink);
+}

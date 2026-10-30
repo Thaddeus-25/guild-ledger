@@ -93,6 +93,11 @@ a {
   filter: brightness(1.08);
 }
 
+/* Pressing a button pushes it down 2px, like a real key. */
+.button:active {
+  transform: translateY(2px);
+}
+
 .button-quiet {
   background: var(--parchment-dark);
 }
@@ -216,5 +221,9 @@ a {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .button:active {
+    transform: none;
   }
 }

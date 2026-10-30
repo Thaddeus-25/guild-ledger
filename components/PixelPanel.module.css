@@ -17,6 +17,12 @@
     0 calc(var(--px) * 3) 0 0 rgb(0 0 0 / 0.3);
 }
 
+/* The gold focus outline is too faint on parchment (1.5:1),
+   so inside panels it turns dark wood (11:1). */
+.panel :focus-visible {
+  outline-color: var(--wood-dark);
+}
+
 .title {
   font-size: 1.25rem;
   margin-bottom: 12px;
