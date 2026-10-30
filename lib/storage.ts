@@ -1,5 +1,8 @@
-// Saving and loading the ledger in the browser's localStorage.
-// To move to a real database later, this is the file to replace.
+// Checking saved ledger data, and reading the OLD browser-only ledger.
+//
+// Before accounts, the ledger was saved in this browser's localStorage.
+// The app no longer writes there (it saves to Supabase, see remoteStore.ts),
+// but still reads it once so you can bring that ledger into your account.
 
 import { isValidDate } from "./dates";
 import { MAX_AMOUNT_CENTS } from "./money";
@@ -86,7 +89,7 @@ function hasDuplicates(values: string[]): boolean {
   return new Set(values).size !== values.length;
 }
 
-// ---------- Reading and writing localStorage ----------
+// ---------- Reading the old ledger from localStorage ----------
 
 export type LoadResult =
   | { kind: "empty" } // nothing saved yet: a first visit
@@ -94,16 +97,21 @@ export type LoadResult =
   | { kind: "corrupt"; raw: string }; // something's saved, but it's unreadable
 
 export function loadSave(): LoadResult {
-  let raw: string | null;
-  try {
-    raw = localStorage.getItem(STORAGE_KEY);
-  } catch {
-    // Some browsers block storage entirely. Start empty; saving will
-    // fail too, and the app shows a warning about that.
-    return { kind: "empty" };
-  }
-  if (raw === null) return { kind: "empty" };
+  return resultFromRaw(readRaw());
+}
 
+// The saved text, or null if there's none (or the browser blocks storage).
+export function readRaw(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+// Sorts saved text into: nothing saved, a readable ledger, or damaged data.
+export function resultFromRaw(raw: string | null): LoadResult {
+  if (raw === null) return { kind: "empty" };
   const data = parseBackup(raw);
   return data ? { kind: "ok", data } : { kind: "corrupt", raw };
 }
@@ -116,19 +124,5 @@ export function parseBackup(text: string): SaveFile | null {
   } catch {
     // JSON.parse throws on text that isn't JSON at all.
     return null;
-  }
-}
-
-// Returns false if the browser refused to save (full or blocked storage).
-export function writeSave(data: SaveFile): boolean {
-  try {
-    const text = JSON.stringify(data);
-    // Already saved (e.g. this tab just loaded it from another tab):
-    // writing it again would only ping the other tabs for nothing.
-    if (localStorage.getItem(STORAGE_KEY) === text) return true;
-    localStorage.setItem(STORAGE_KEY, text);
-    return true;
-  } catch {
-    return false;
   }
 }
