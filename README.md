@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guild Ledger
 
-## Getting Started
+A cozy pixel-art budgeting app. You run an adventurer's ledger: record the gold that comes in and goes out, sort it into Coin Pouches, set monthly limits, and see each month at a glance.
 
-First, run the development server:
+| In the app | Means |
+|---|---|
+| Gold | Money (shown in US dollars) |
+| Guild Hall | Dashboard: the month's income, expenses, what's left, and pouch limits |
+| Ledger | Your list of income and expense entries |
+| Coin Pouches | Categories, with optional monthly spending limits |
+| Hearth | Settings, backups, reset |
+| Logbook stamps / Guild rank | Optional rewards: one stamp per day you record an entry |
+
+## Running it
+
+You need [Node.js](https://nodejs.org) 22.12 or newer; a long-term-support version like 24 is best. Run these commands inside this folder.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install      # first time only: downloads the libraries
+npm run dev      # starts the app at http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other commands:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm test         # runs the automated tests (Vitest)
+npm run lint     # checks the code for common mistakes
+npm run build    # builds the optimized version you'd put on a website
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+If `npm run dev` says **"Another next dev server is already running"**, an old server is still open. Close that terminal, or run the `taskkill /PID … /F` command the message suggests.
 
-## Learn More
+## Where your data is saved
 
-To learn more about Next.js, take a look at the following resources:
+Everything is saved in your web browser's **localStorage**, under the key `guild-ledger:save`. To see it, open the browser's developer tools (F12) and go to **Application → Local Storage**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+That keeps the first version simple: no server, no account, nothing to pay for. It also has limits:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **One browser on one device.** Your phone won't see what you entered on your laptop.
+- **Clearing browsing data, or using a private window, removes it or hides it.**
+- **It isn't encrypted.** Anyone using your computer account could read it.
+- **There's room for about 5 MB**, which is years of entries.
 
-## Deploy on Vercel
+So use **Hearth → Download backup** now and then. **Restore from backup** brings a backup file back.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Upgrading the storage later
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Only `lib/storage.ts` knows that localStorage exists. Every other file works with the `SaveFile` shape from `lib/types.ts`. To upgrade, you replace that one file:
+
+1. **IndexedDB**, the browser's built-in database: more room, but still one device. A small library like Dexie makes it friendlier.
+2. **A hosted database with sign-in**, such as Supabase (the Pocket Mochi project already uses it). Your ledger syncs across devices. This needs accounts, security rules so each person sees only their own data, and a way to move existing localStorage data across. The backup file is already in the right shape for that.
+
+The saved data carries `version: 1`. If the shape ever changes, bump the version and add code that upgrades older saves, so nobody's ledger gets thrown away.
+
+## How the code is organized
+
+```
+app/            pages: one folder per web address
+  page.tsx        Guild Hall (/)
+  ledger/         Ledger (/ledger), new entry (/ledger/new), edit entry (/ledger/[id])
+  pouches/        Coin Pouches (/pouches)
+  hearth/         Hearth (/hearth)
+  layout.tsx      the frame around every page: fonts, nav bar, saved data
+  globals.css     colors, buttons, form fields shared by every page
+components/     reusable pieces: NavBar, PixelPanel, PixelIcon, BudgetBar, forms…
+lib/            logic with no screen code, each file with its own .test.ts
+  types.ts        the shape of the saved data
+  money.ts        cents <-> "$12.50" (money is always stored as whole cents)
+  dates.ts        "YYYY-MM-DD" date helpers (no time-zone surprises)
+  budget.ts       monthly totals and pouch limits
+  validation.ts   checks for the entry and pouch forms
+  storage.ts      saving, loading, and checking saved data
+  ledgerReducer.ts / appState.ts   every change to the data goes through these
+  LedgerContext.tsx               shares the data with every page
+docs/superpowers/ the design spec and the step-by-step build plan
+```
+
+## Planned for later
+
+- **Quests:** savings goals with progress, for example "Save $500 for a new cloak".
+- Different limits for different months, recurring entries, charts, and a night theme.
