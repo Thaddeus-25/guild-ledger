@@ -1,12 +1,12 @@
 // Saving and loading the ledger in the browser's localStorage.
 // To move to a real database later, this is the file to replace.
 
+import { isValidDate } from "./dates";
+import { MAX_AMOUNT_CENTS } from "./money";
 import { ICON_NAMES } from "./types";
 import type { Category, EntryType, SaveFile, Transaction } from "./types";
 
 export const STORAGE_KEY = "guild-ledger:save";
-
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 // ---------- Checking that saved data has the right shape ----------
 // Saved data can be damaged or edited by hand, so we never just trust it.
@@ -19,22 +19,27 @@ function isEntryType(value: unknown): value is EntryType {
   return value === "income" || value === "expense";
 }
 
-function isPositiveWholeNumber(value: unknown): value is number {
-  return Number.isInteger(value) && (value as number) > 0;
+// A money amount the app itself could have saved: whole cents, $0.01 to $1,000,000.
+function isAmount(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) > 0 && (value as number) <= MAX_AMOUNT_CENTS;
 }
 
 function isDate(value: unknown): value is string {
-  return typeof value === "string" && DATE_PATTERN.test(value);
+  return typeof value === "string" && isValidDate(value);
 }
 
 function isCategory(value: unknown): value is Category {
+  if (!isObject(value)) return false;
+  // Only expense pouches may have a limit.
+  const limitOk =
+    value.monthlyLimitCents === undefined ||
+    (value.type === "expense" && isAmount(value.monthlyLimitCents));
   return (
-    isObject(value) &&
     typeof value.id === "string" &&
     typeof value.name === "string" &&
     isEntryType(value.type) &&
     (ICON_NAMES as readonly unknown[]).includes(value.icon) &&
-    (value.monthlyLimitCents === undefined || isPositiveWholeNumber(value.monthlyLimitCents))
+    limitOk
   );
 }
 
@@ -43,7 +48,7 @@ function isTransaction(value: unknown): value is Transaction {
     isObject(value) &&
     typeof value.id === "string" &&
     isEntryType(value.type) &&
-    isPositiveWholeNumber(value.amountCents) &&
+    isAmount(value.amountCents) &&
     isDate(value.date) &&
     typeof value.categoryId === "string" &&
     (value.note === undefined || typeof value.note === "string")
@@ -60,6 +65,10 @@ export function validateSaveFile(value: unknown): SaveFile | null {
   if (!Array.isArray(logbookDays) || !logbookDays.every(isDate)) return null;
   if (!isObject(settings) || typeof settings.showRewards !== "boolean") return null;
 
+  // Ids must be unique, or editing one entry would change its twin too.
+  if (hasDuplicates(categories.map((c) => c.id))) return null;
+  if (hasDuplicates(transactions.map((t) => t.id))) return null;
+
   // Every entry must point at a pouch that exists and has the same type.
   const pouchTypes = new Map(categories.map((c) => [c.id, c.type]));
   if (!transactions.every((t) => pouchTypes.get(t.categoryId) === t.type)) return null;
@@ -68,9 +77,13 @@ export function validateSaveFile(value: unknown): SaveFile | null {
     version: 1,
     categories,
     transactions,
-    logbookDays,
+    logbookDays: [...new Set(logbookDays)], // one stamp per day, even if repeated
     settings: { showRewards: settings.showRewards },
   };
+}
+
+function hasDuplicates(values: string[]): boolean {
+  return new Set(values).size !== values.length;
 }
 
 // ---------- Reading and writing localStorage ----------
@@ -109,7 +122,11 @@ export function parseBackup(text: string): SaveFile | null {
 // Returns false if the browser refused to save (full or blocked storage).
 export function writeSave(data: SaveFile): boolean {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const text = JSON.stringify(data);
+    // Already saved (e.g. this tab just loaded it from another tab):
+    // writing it again would only ping the other tabs for nothing.
+    if (localStorage.getItem(STORAGE_KEY) === text) return true;
+    localStorage.setItem(STORAGE_KEY, text);
     return true;
   } catch {
     return false;

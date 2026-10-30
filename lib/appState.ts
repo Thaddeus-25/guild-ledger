@@ -13,6 +13,7 @@ export interface AppState {
   data: SaveFile;
   corruptRaw: string | null; // unreadable saved text, kept so it can be downloaded
   saveFailed: boolean;
+  saveFailures: number; // how many saves have failed, so each new one can warn again
 }
 
 export type AppAction =
@@ -22,7 +23,13 @@ export type AppAction =
   | { type: "startFresh" };
 
 export function createInitialAppState(): AppState {
-  return { status: "loading", data: createStarterData(), corruptRaw: null, saveFailed: false };
+  return {
+    status: "loading",
+    data: createStarterData(),
+    corruptRaw: null,
+    saveFailed: false,
+    saveFailures: 0,
+  };
 }
 
 export function appReducer(state: AppState, action: AppAction): AppState {
@@ -37,9 +44,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "saveResult":
+      if (!action.ok) {
+        return { ...state, saveFailed: true, saveFailures: state.saveFailures + 1 };
+      }
       // Returning the same object tells React nothing changed.
-      if (state.saveFailed === !action.ok) return state;
-      return { ...state, saveFailed: !action.ok };
+      return state.saveFailed ? { ...state, saveFailed: false } : state;
 
     case "startFresh":
       return { ...state, status: "ready", data: createStarterData(), corruptRaw: null };

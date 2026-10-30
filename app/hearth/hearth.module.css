@@ -39,17 +39,21 @@
 
 .fileInput:focus-visible + label {
   outline: 3px solid var(--wood-dark);
-  outline-offset: 2px;
+  outline-offset: 7px; /* clear of the button's 4px pixel border */
 }
 
+/* These sit on the night background, outside any panel, so they need
+   their own dark text color (otherwise they inherit light parchment text). */
 .success {
   padding: 8px 12px;
+  color: var(--ink);
   background: var(--parchment-dark);
   border-left: var(--px) solid var(--moss);
 }
 
 .error {
   padding: 8px 12px;
+  color: var(--ink);
   background: var(--parchment-dark);
   border-left: var(--px) solid var(--amber);
   font-weight: 700;

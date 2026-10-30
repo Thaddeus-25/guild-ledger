@@ -10,8 +10,9 @@ import { useLedger } from "@/lib/LedgerContext";
 import styles from "./LedgerGate.module.css";
 
 export default function LedgerGate({ children }: { children: React.ReactNode }) {
-  const { status, corruptRaw, saveFailed, startFresh } = useLedger();
-  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const { status, corruptRaw, saveFailed, saveFailures, startFresh } = useLedger();
+  // Which failure the banner was dismissed at. A later failure shows it again.
+  const [dismissedAt, setDismissedAt] = useState(0);
 
   if (status === "loading") {
     return <p className={styles.loading}>Opening the ledger…</p>;
@@ -49,7 +50,7 @@ export default function LedgerGate({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      {saveFailed && !bannerDismissed && (
+      {saveFailed && saveFailures > dismissedAt && (
         <div role="alert" className={styles.banner}>
           <p>
             Couldn&apos;t save to this browser. Download a backup from Hearth to keep
@@ -58,7 +59,7 @@ export default function LedgerGate({ children }: { children: React.ReactNode }) 
           <button
             type="button"
             className="button button-quiet"
-            onClick={() => setBannerDismissed(true)}
+            onClick={() => setDismissedAt(saveFailures)}
           >
             Dismiss
           </button>

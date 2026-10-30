@@ -64,3 +64,16 @@ describe("appReducer", () => {
     expect(state.data).toEqual(createStarterData());
   });
 });
+
+describe("appReducer save failures", () => {
+  it("counts every failed save, so a new failure can warn again", () => {
+    const ready = appReducer(createInitialAppState(), { type: "loaded", result: { kind: "empty" } });
+    const once = appReducer(ready, { type: "saveResult", ok: false });
+    const twice = appReducer(once, { type: "saveResult", ok: false });
+    expect(twice.saveFailures).toBe(2);
+
+    const recovered = appReducer(twice, { type: "saveResult", ok: true });
+    expect(recovered.saveFailed).toBe(false);
+    expect(recovered.saveFailures).toBe(2);
+  });
+});

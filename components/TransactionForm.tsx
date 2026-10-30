@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { todayISO } from "@/lib/dates";
+import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
 import { centsToInput } from "@/lib/money";
 import type { EntryType, Transaction } from "@/lib/types";
@@ -27,6 +28,10 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [note, setNote] = useState(initial?.note ?? "");
   const [errors, setErrors] = useState<TransactionErrors>({});
+  // Set on the first successful save. The page takes a moment to switch,
+  // and a double-click in that moment must not record the entry twice.
+  // A ref (not state) because it must change instantly, between clicks.
+  const saved = useRef(false);
 
   const pouchesOfType = data.categories.filter((c) => c.type === type);
 
@@ -39,6 +44,7 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saved.current) return;
 
     const result = validateTransactionInput({ type, amount, date, categoryId, note }, data.categories);
     if (!result.ok) {
@@ -46,12 +52,13 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
       return;
     }
 
+    saved.current = true;
     if (initial) {
       dispatch({ type: "updateTransaction", transaction: { id: initial.id, ...result.value } });
     } else {
       dispatch({
         type: "addTransaction",
-        transaction: { id: crypto.randomUUID(), ...result.value },
+        transaction: { id: newId(), ...result.value },
         today: todayISO(),
       });
     }

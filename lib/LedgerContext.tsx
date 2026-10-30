@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useReducer, useState } from "reac
 import { appReducer, createInitialAppState, type LedgerStatus } from "./appState";
 import { monthOf, todayISO } from "./dates";
 import type { LedgerAction } from "./ledgerReducer";
-import { loadSave, writeSave } from "./storage";
+import { loadSave, STORAGE_KEY, writeSave } from "./storage";
 import type { SaveFile } from "./types";
 
 interface LedgerContextValue {
@@ -16,6 +16,7 @@ interface LedgerContextValue {
   data: SaveFile;
   corruptRaw: string | null;
   saveFailed: boolean;
+  saveFailures: number;
   selectedMonth: string; // "2026-10", shared by Guild Hall and Ledger
   setSelectedMonth: (month: string) => void;
   dispatch: (action: LedgerAction) => void;
@@ -44,6 +45,20 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
     dispatchApp({ type: "saveResult", ok: writeSave(data) });
   }, [data, status]);
 
+  // 3) ANOTHER TAB changed the ledger. The browser tells every other tab
+  //    with a "storage" event. Reload the newer data, so this tab never
+  //    saves its out-of-date copy over entries made in the other tab.
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      // key is null when the other tab cleared all storage.
+      if (event.key === STORAGE_KEY || event.key === null) {
+        dispatchApp({ type: "loaded", result: loadSave() });
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   return (
     <LedgerContext.Provider
       value={{
@@ -51,6 +66,7 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
         data,
         corruptRaw: state.corruptRaw,
         saveFailed: state.saveFailed,
+        saveFailures: state.saveFailures,
         selectedMonth,
         setSelectedMonth,
         dispatch: dispatchApp,

@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import PixelIcon from "./PixelIcon";
+import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
 import { centsToInput } from "@/lib/money";
 import { ICON_NAMES, type Category, type EntryType, type IconName } from "@/lib/types";
@@ -40,7 +41,7 @@ export default function CategoryForm({ type, initial, onDone }: CategoryFormProp
     if (initial) {
       dispatch({ type: "updateCategory", category: { id: initial.id, ...result.value } });
     } else {
-      dispatch({ type: "addCategory", category: { id: crypto.randomUUID(), ...result.value } });
+      dispatch({ type: "addCategory", category: { id: newId(), ...result.value } });
     }
     onDone();
   }

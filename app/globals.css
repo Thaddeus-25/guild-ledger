@@ -93,6 +93,12 @@ a {
   filter: brightness(1.08);
 }
 
+/* A button's border is drawn 4px OUTSIDE it (box-shadow), so push the
+   focus ring further out, leaving a visible gap instead of hiding on top. */
+.button:focus-visible {
+  outline-offset: 7px;
+}
+
 /* Pressing a button pushes it down 2px, like a real key. */
 .button:active {
   transform: translateY(2px);
