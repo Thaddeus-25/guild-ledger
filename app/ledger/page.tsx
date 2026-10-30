@@ -5,7 +5,7 @@ import { useState } from "react";
 import MonthPicker from "@/components/MonthPicker";
 import PixelPanel from "@/components/PixelPanel";
 import TransactionList from "@/components/TransactionList";
-import { monthOf } from "@/lib/dates";
+import { monthTransactions } from "@/lib/budget";
 import { newestFirst } from "@/lib/entries";
 import { useLedger } from "@/lib/LedgerContext";
 import type { EntryType } from "@/lib/types";
@@ -25,8 +25,8 @@ export default function LedgerPage() {
   // Worked out fresh on every render from the saved entries,
   // so the list can never get out of step with the data.
   const entries = newestFirst(
-    data.transactions.filter(
-      (t) => monthOf(t.date) === selectedMonth && (filter === "all" || t.type === filter),
+    monthTransactions(data.transactions, selectedMonth).filter(
+      (t) => filter === "all" || t.type === filter,
     ),
   );
 
