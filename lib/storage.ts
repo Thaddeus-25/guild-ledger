@@ -91,13 +91,19 @@ export function loadSave(): LoadResult {
   }
   if (raw === null) return { kind: "empty" };
 
+  const data = parseBackup(raw);
+  return data ? { kind: "ok", data } : { kind: "corrupt", raw };
+}
+
+// Turns saved text (from localStorage or a backup file) into ledger data,
+// or null if it isn't a valid Guild Ledger save.
+export function parseBackup(text: string): SaveFile | null {
   try {
-    const data = validateSaveFile(JSON.parse(raw));
-    if (data) return { kind: "ok", data };
+    return validateSaveFile(JSON.parse(text));
   } catch {
     // JSON.parse throws on text that isn't JSON at all.
+    return null;
   }
-  return { kind: "corrupt", raw };
 }
 
 // Returns false if the browser refused to save (full or blocked storage).

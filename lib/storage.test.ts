@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createStarterData } from "./starterData";
-import { validateSaveFile } from "./storage";
+import { parseBackup, validateSaveFile } from "./storage";
 import type { Transaction } from "./types";
 
 // Starter data plus one entry, with any fields we want to break.
@@ -46,5 +46,23 @@ describe("validateSaveFile", () => {
 
   it("rejects a note that isn't text", () => {
     expect(validateSaveFile(saveWithEntry({ note: 5 }))).toBeNull();
+  });
+});
+
+describe("parseBackup", () => {
+  it("reads a backup file's text, pretty-printed or not", () => {
+    const data = createStarterData();
+    expect(parseBackup(JSON.stringify(data))).toEqual(data);
+    expect(parseBackup(JSON.stringify(data, null, 2))).toEqual(data);
+  });
+
+  it("returns null for text that isn't JSON at all", () => {
+    expect(parseBackup("not json")).toBeNull();
+    expect(parseBackup("")).toBeNull();
+  });
+
+  it("returns null for JSON that isn't a Guild Ledger save", () => {
+    expect(parseBackup('{"hello": 1}')).toBeNull();
+    expect(parseBackup("[]")).toBeNull();
   });
 });

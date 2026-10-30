@@ -13,3 +13,44 @@
   accent-color: var(--moss);
   cursor: pointer;
 }
+
+.limits {
+  margin: 8px 0 12px 20px;
+}
+
+.limits li {
+  margin-bottom: 4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+/* The file picker's real input is hidden; its label is styled as a button. */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.fileInput:focus-visible + label {
+  outline: 3px solid var(--wood-dark);
+  outline-offset: 2px;
+}
+
+.success {
+  padding: 8px 12px;
+  background: var(--parchment-dark);
+  border-left: var(--px) solid var(--moss);
+}
+
+.error {
+  padding: 8px 12px;
+  background: var(--parchment-dark);
+  border-left: var(--px) solid var(--amber);
+  font-weight: 700;
+}
