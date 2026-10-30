@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import BudgetBar from "@/components/BudgetBar";
+import ClerkMessage from "@/components/ClerkMessage";
 import MonthPicker from "@/components/MonthPicker";
 import PixelIcon from "@/components/PixelIcon";
 import PixelPanel from "@/components/PixelPanel";
 import SummaryCard from "@/components/SummaryCard";
 import TransactionList from "@/components/TransactionList";
 import { monthTotals, monthTransactions, pouchUsage, unlimitedSpending } from "@/lib/budget";
+import { clerkMessage } from "@/lib/clerk";
+import { todayISO } from "@/lib/dates";
 import { newestFirst } from "@/lib/entries";
 import { useLedger } from "@/lib/LedgerContext";
 import { formatCents } from "@/lib/money";
@@ -21,7 +24,16 @@ export default function GuildHallPage() {
   const totals = monthTotals(transactions, selectedMonth);
   const limited = pouchUsage(categories, transactions, selectedMonth);
   const unlimited = unlimitedSpending(categories, transactions, selectedMonth);
-  const recent = newestFirst(monthTransactions(transactions, selectedMonth)).slice(0, 5);
+  const inMonth = monthTransactions(transactions, selectedMonth);
+  const recent = newestFirst(inMonth).slice(0, 5);
+
+  const today = todayISO();
+  const message = clerkMessage({
+    monthEntryCount: inMonth.length,
+    overPouchNames: limited.filter((u) => u.status === "over").map((u) => u.category.name),
+    recordedToday: data.logbookDays.includes(today),
+    dayOfMonth: Number(today.slice(8)), // "2026-10-29" -> 29
+  });
 
   return (
     <>
@@ -29,6 +41,7 @@ export default function GuildHallPage() {
       <p className="page-subtitle">Your month at a glance</p>
 
       <MonthPicker />
+      <ClerkMessage message={message} />
 
       <div className={styles.cards}>
         <SummaryCard title="Gold earned" plain="Income" cents={totals.incomeCents} icon="coin" />
