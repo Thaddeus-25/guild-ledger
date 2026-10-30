@@ -34,6 +34,17 @@ export function getSupabase(): SupabaseClient | null {
   return client;
 }
 
+// Whether the settings are there, without connecting. Safe to call while
+// Next.js pre-renders pages on the server, where there's no browser.
+export function isSupabaseConfigured(): boolean {
+  return (
+    readSupabaseConfig(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    ) !== null
+  );
+}
+
 // True if the app was opened from a password-reset email link.
 export function openedFromRecoveryLink(): boolean {
   return recoveryLink;

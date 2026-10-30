@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Next, Pixelify_Sans } from "next/font/google";
 import LedgerGate from "@/components/LedgerGate";
 import NavBar from "@/components/NavBar";
+import { AuthProvider } from "@/lib/AuthContext";
 import { LedgerProvider } from "@/lib/LedgerContext";
 import "./globals.css";
 
@@ -26,12 +27,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${pixelFont.variable} ${bodyFont.variable}`}>
       <body>
-        <LedgerProvider>
-          <NavBar />
-          <main className="page">
-            <LedgerGate>{children}</LedgerGate>
-          </main>
-        </LedgerProvider>
+        {/* AuthProvider comes first: the ledger needs to know who's logged in. */}
+        <AuthProvider>
+          <LedgerProvider>
+            <NavBar />
+            <main className="page">
+              <LedgerGate>{children}</LedgerGate>
+            </main>
+          </LedgerProvider>
+        </AuthProvider>
       </body>
     </html>
   );
