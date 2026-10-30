@@ -77,10 +77,10 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <fieldset className={styles.typeToggle}>
+      <fieldset className="choice-group">
         <legend className="field-label">Type</legend>
         {(["expense", "income"] as const).map((option) => (
-          <label key={option} className={styles.typeOption}>
+          <label key={option} className="choice">
             <input
               type="radio"
               name={`${formId}-type`}

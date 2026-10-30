@@ -1,0 +1,74 @@
+.empty {
+  padding: 16px 0;
+  font-style: italic;
+}
+
+.list {
+  list-style: none;
+}
+
+/* icon | pouch + date | amount, with Edit/Delete on the right. */
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-bottom: 2px dashed var(--parchment-dark);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* lets long notes wrap instead of widening the row */
+  overflow-wrap: anywhere;
+}
+
+.pouch {
+  font-weight: 700;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: var(--wood);
+}
+
+.income,
+.expense {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.income .amount {
+  color: #3f6b22; /* darker moss, readable on parchment */
+}
+
+.kind {
+  font-size: 0.8rem;
+  color: var(--wood);
+}
+
+/* On phones the buttons drop to their own line under the entry. */
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+@media (min-width: 640px) {
+  .row {
+    grid-template-columns: auto 1fr auto auto;
+  }
+
+  .actions {
+    grid-column: auto;
+  }
+}

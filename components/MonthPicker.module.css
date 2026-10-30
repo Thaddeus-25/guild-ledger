@@ -1,0 +1,15 @@
+.picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.month {
+  min-width: 11ch;
+  text-align: center;
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.4rem;
+  color: var(--gold);
+}
