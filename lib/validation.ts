@@ -1,8 +1,9 @@
 // Checks what someone typed into a form. Each function returns either
 // clean data ready to save, or one friendly message per problem field.
 
+import { isValidDate } from "./dates";
 import { parseAmount } from "./money";
-import type { Category, EntryType, IconName } from "./types";
+import type { Category, EntryType, IconName, Transaction } from "./types";
 
 // ---------- Coin Pouch form ----------
 
@@ -52,4 +53,56 @@ export function validateCategoryInput(
 
   if (errors.name || errors.limit) return { ok: false, errors };
   return { ok: true, value: { name, type: input.type, icon: input.icon, monthlyLimitCents } };
+}
+
+// ---------- Ledger entry form ----------
+
+export interface TransactionInput {
+  type: EntryType;
+  amount: string;
+  date: string;
+  categoryId: string;
+  note: string;
+}
+
+export type TransactionErrors = {
+  amount?: string;
+  date?: string;
+  categoryId?: string;
+  note?: string;
+};
+
+export type TransactionResult =
+  | { ok: true; value: Omit<Transaction, "id"> }
+  | { ok: false; errors: TransactionErrors };
+
+export function validateTransactionInput(
+  input: TransactionInput,
+  categories: Category[],
+): TransactionResult {
+  const errors: TransactionErrors = {};
+
+  const amount = parseAmount(input.amount);
+  if (!amount.ok) errors.amount = amount.error;
+
+  if (!isValidDate(input.date)) errors.date = "Pick a date.";
+
+  // The pouch must exist AND match the entry's type (no income in Provisions).
+  const pouch = categories.find((c) => c.id === input.categoryId);
+  if (!pouch || pouch.type !== input.type) errors.categoryId = "Choose a pouch.";
+
+  const note = input.note.trim();
+  if (note.length > 200) errors.note = "Keep the note to 200 characters or fewer.";
+
+  if (!amount.ok || Object.keys(errors).length > 0) return { ok: false, errors };
+  return {
+    ok: true,
+    value: {
+      type: input.type,
+      amountCents: amount.cents,
+      date: input.date,
+      categoryId: input.categoryId,
+      note: note === "" ? undefined : note,
+    },
+  };
 }

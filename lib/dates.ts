@@ -14,6 +14,17 @@ export function todayISO(now: Date = new Date()): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
+// True for real calendar days like "2026-02-28", false for "2026-02-30" or "soon".
+export function isValidDate(date: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const [year, monthNumber, day] = date.split("-").map(Number);
+  const built = new Date(year, monthNumber - 1, day);
+  // JavaScript quietly turns Feb 30 into Mar 2, so check nothing moved.
+  return (
+    built.getFullYear() === year && built.getMonth() === monthNumber - 1 && built.getDate() === day
+  );
+}
+
 // "2026-10-29" -> "2026-10"
 export function monthOf(date: string): string {
   return date.slice(0, 7);
