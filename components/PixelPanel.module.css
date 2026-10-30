@@ -1,0 +1,24 @@
+.panel {
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 20px;
+  /* Room for the border, which is drawn outside the box. */
+  margin: calc(var(--px) * 2) var(--px) calc(var(--px) * 4);
+  /* Four solid shadows, one per side, make the border. They don't
+     overlap at the corners, which leaves the "notched" pixel look. */
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--wood-dark),
+    0 var(--px) 0 0 var(--wood-dark),
+    calc(var(--px) * -1) 0 0 0 var(--wood-dark),
+    var(--px) 0 0 0 var(--wood-dark),
+    /* darker inner edge at the bottom, like a page's thickness */
+    inset 0 calc(var(--px) * -1) 0 0 var(--parchment-dark),
+    /* soft drop shadow underneath */
+    0 calc(var(--px) * 3) 0 0 rgb(0 0 0 / 0.3);
+}
+
+.title {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  color: var(--wood-dark);
+}

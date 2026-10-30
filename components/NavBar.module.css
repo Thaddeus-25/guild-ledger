@@ -1,0 +1,83 @@
+/* Phone layout first: a bar fixed to the bottom of the screen. */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: var(--wood);
+  /* Thin dark lines every 16px look like wooden planks. */
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 14px,
+    rgb(0 0 0 / 0.18) 14px 16px
+  );
+  border-top: var(--px) solid var(--wood-dark);
+}
+
+.brand {
+  display: none;
+}
+
+.tabs {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 6px 4px;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.9rem;
+  line-height: 1.1;
+  color: var(--parchment);
+}
+
+.tab:hover {
+  background: rgb(0 0 0 / 0.15);
+}
+
+/* The tab for the page you're on looks like a parchment tag. */
+.tab[aria-current="page"] {
+  background: var(--parchment);
+  color: var(--ink);
+}
+
+/* Wider screens: the bar moves to the top and shows the app name. */
+@media (min-width: 640px) {
+  .nav {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-top: none;
+    border-bottom: var(--px) solid var(--wood-dark);
+  }
+
+  .brand {
+    display: block;
+    font-family: var(--font-pixel), monospace;
+    font-size: 1.5rem;
+    color: var(--gold);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .tab {
+    min-height: 60px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+}
