@@ -29,3 +29,31 @@
 .banner :focus-visible {
   outline-color: var(--ink);
 }
+
+.bannerButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Calmer than the banner: news, not a problem. Dark text on parchment. */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--parchment-dark);
+  color: var(--ink);
+  border-left: var(--px) solid var(--gold);
+}
+
+.notice a {
+  font-weight: 700;
+}
+
+.notice :focus-visible {
+  outline-color: var(--wood-dark);
+}

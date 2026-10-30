@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/AuthContext";
 import styles from "./NavBar.module.css";
 
 const TABS = [
@@ -14,6 +15,10 @@ const TABS = [
 export default function NavBar() {
   // The current address, e.g. "/ledger" or "/ledger/new".
   const pathname = usePathname();
+  const { status } = useAuth();
+
+  // Nothing to visit until you've logged in through the Guild Gate.
+  if (status !== "signed-in") return null;
 
   return (
     <nav className={styles.nav} aria-label="Main">

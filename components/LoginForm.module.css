@@ -1,0 +1,30 @@
+.intro {
+  margin-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Messages after pressing a button. Dark text on parchment for contrast. */
+.error,
+.info {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--parchment-dark);
+  border-left: var(--px) solid var(--amber);
+  font-weight: 700;
+}
+
+.info {
+  border-left-color: var(--moss);
+  font-weight: 400;
+}
+
+.actions button:disabled {
+  cursor: wait;
+  filter: grayscale(0.4);
+}
