@@ -2,18 +2,58 @@
 
 import { useState } from "react";
 import PixelPanel from "@/components/PixelPanel";
+import { useAuth } from "@/lib/AuthContext";
+import { combineLedgers } from "@/lib/combineLedgers";
 import { todayISO } from "@/lib/dates";
 import { downloadText } from "@/lib/download";
 import { useLedger } from "@/lib/LedgerContext";
+import { forgetOldLedger, oldLedgerCounts } from "@/lib/oldLedger";
 import { createStarterData } from "@/lib/starterData";
 import { parseBackup } from "@/lib/storage";
+import { useOldLedger } from "@/lib/useOldLedger";
 import styles from "./hearth.module.css";
 
 type Notice = { kind: "success" | "error"; text: string } | null;
 
 export default function HearthPage() {
-  const { data, dispatch } = useLedger();
+  const { user, signOut } = useAuth();
+  const { data, dirty, saving, dispatch } = useLedger();
+  const oldLedger = useOldLedger();
   const [notice, setNotice] = useState<Notice>(null);
+
+  async function logOut() {
+    if (dirty || saving) {
+      const sure = window.confirm("You have a change that isn't saved yet. Log out anyway?");
+      if (!sure) return;
+    }
+    const problem = await signOut();
+    // On success the Guild Gate replaces this page, so only problems need showing.
+    if (problem) setNotice({ kind: "error", text: `Couldn't log out: ${problem}` });
+  }
+
+  function addOldLedger() {
+    if (oldLedger.kind !== "ok") return;
+    dispatch({ type: "replaceAll", data: combineLedgers(data, oldLedger.data) });
+    forgetOldLedger();
+    setNotice({ kind: "success", text: "Your old ledger was added to your account." });
+  }
+
+  function downloadOldLedger() {
+    if (oldLedger.kind === "ok") {
+      downloadText(`guild-ledger-old-browser-ledger-${todayISO()}.json`, JSON.stringify(oldLedger.data, null, 2));
+    } else if (oldLedger.kind === "corrupt") {
+      downloadText("guild-ledger-old-damaged-data.txt", oldLedger.raw);
+    }
+  }
+
+  function discardOldLedger() {
+    const sure = window.confirm(
+      "Discard the old ledger in this browser? Download it first if you might want it.",
+    );
+    if (!sure) return;
+    forgetOldLedger();
+    setNotice({ kind: "success", text: "The old ledger was removed from this browser." });
+  }
 
   function downloadBackup() {
     downloadText(`guild-ledger-backup-${todayISO()}.json`, JSON.stringify(data, null, 2));
@@ -59,13 +99,48 @@ export default function HearthPage() {
         </p>
       )}
 
+      <PixelPanel title="Your guild account">
+        <p>
+          Logged in as <strong>{user?.email}</strong>
+        </p>
+        <div className={styles.actions}>
+          <button type="button" className="button button-quiet" onClick={logOut}>
+            Log out
+          </button>
+        </div>
+      </PixelPanel>
+
+      {oldLedgerCounts(oldLedger) && (
+        <PixelPanel title="A ledger from before accounts">
+          <p>
+            This browser still has a ledger saved from before you had an account. It isn&apos;t
+            part of your account yet.
+          </p>
+          {oldLedger.kind === "corrupt" && (
+            <p>It&apos;s damaged and can&apos;t be read, but you can download it to keep a copy.</p>
+          )}
+          <div className={styles.actions}>
+            {oldLedger.kind === "ok" && (
+              <button type="button" className="button" onClick={addOldLedger}>
+                Add it to my account
+              </button>
+            )}
+            <button type="button" className="button button-quiet" onClick={downloadOldLedger}>
+              Download it
+            </button>
+            <button type="button" className="button button-quiet" onClick={discardOldLedger}>
+              Discard it
+            </button>
+          </div>
+        </PixelPanel>
+      )}
+
       <PixelPanel title="Your data">
-        <p>Your ledger is saved inside this web browser, on this device. That means:</p>
+        <p>Your ledger is saved to your guild account online. That means:</p>
         <ul className={styles.limits}>
-          <li>It stays in this browser only. Your phone or another browser won&apos;t see it.</li>
-          <li>Clearing your browsing data, or using a private window, removes it or hides it.</li>
-          <li>It isn&apos;t encrypted, so anyone using this computer account could read it.</li>
-          <li>There&apos;s room for about 5 MB, which is years of entries.</li>
+          <li>Every device you log in on shows the same ledger.</li>
+          <li>You need a signal to save changes. Without one, the app tells you and saves later.</li>
+          <li>Only you can read it: the guild archives check your login on every request.</li>
         </ul>
         <p>Download a backup now and then, so you can always get your ledger back.</p>
 
