@@ -27,6 +27,9 @@ export interface LedgerRow {
 }
 
 export interface LedgerTable {
+  // Is there a usable login right now? (It can briefly be missing while
+  // Supabase refreshes it on a weak signal.)
+  hasSession(): Promise<boolean>;
   select(userId: string): Promise<DbResult<LedgerRow>>; // data is null when there's no row
   insert(userId: string, data: SaveFile): Promise<DbResult<null>>; // creates the row at version 1
   update(userId: string, expectedVersion: number, data: SaveFile): Promise<DbResult<{ version: number }[]>>;
@@ -55,6 +58,9 @@ function problem(result: DbResult<unknown>): { kind: "offline" } | { kind: "fail
 }
 
 export async function loadLedger(table: LedgerTable, userId: string): Promise<RemoteLoadResult> {
+  // Without a login the request would go out as a logged-out visitor, see
+  // no ledger, and look like an empty account. Treat it as "try again later".
+  if (!(await table.hasSession())) return { kind: "offline" };
   const result = await table.select(userId);
   if (result.error) return problem(result);
   if (!result.data) return { kind: "empty" };
@@ -73,6 +79,9 @@ export async function saveLedger(
   data: SaveFile,
   version: number | null,
 ): Promise<SaveResult> {
+  // Same as loading: never save as a logged-out visitor.
+  if (!(await table.hasSession())) return { kind: "offline" };
+
   if (version === null) {
     const result = await table.insert(userId, data);
     if (result.error?.code === DUPLICATE_KEY) return { kind: "clash" };
@@ -103,6 +112,14 @@ async function safely<T>(request: () => PromiseLike<DbResult<T>>): Promise<DbRes
 
 export function supabaseLedgerTable(client: SupabaseClient): LedgerTable {
   return {
+    hasSession: async () => {
+      try {
+        const { data } = await client.auth.getSession();
+        return data.session !== null;
+      } catch {
+        return false;
+      }
+    },
     select: (userId) =>
       safely(() => client.from("ledgers").select("data, version").eq("user_id", userId).maybeSingle()),
     insert: (userId, data) =>

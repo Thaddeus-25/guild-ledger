@@ -10,10 +10,18 @@
 // them out.
 
 import { createContext, useContext, useEffect, useReducer, useState } from "react";
-import { appReducer, createInitialAppState, type AppState, type LedgerStatus } from "./appState";
+import {
+  appReducer,
+  createInitialAppState,
+  type AppState,
+  type ImportState,
+  type LedgerStatus,
+  type SetAside,
+} from "./appState";
 import { useAuth } from "./AuthContext";
 import { monthOf, todayISO } from "./dates";
 import type { LedgerAction } from "./ledgerReducer";
+import { forgetOldLedger } from "./oldLedger";
 import { loadLedger, saveLedger, supabaseLedgerTable, type LedgerTable } from "./remoteStore";
 import { nextSave } from "./saveQueue";
 import { getSupabase, isSupabaseConfigured } from "./supabaseClient";
@@ -28,12 +36,15 @@ interface LedgerContextValue {
   saveProblem: AppState["saveProblem"];
   saveFailures: number;
   clashNotice: boolean;
+  setAside: SetAside | null; // unsaved changes that made way for something newer
+  importState: ImportState;
   selectedMonth: string; // "2026-10", shared by Guild Hall and Ledger
   setSelectedMonth: (month: string) => void;
   dispatch: (action: LedgerAction) => void;
   startFresh: () => void;
   retry: () => void;
   dismissClash: () => void;
+  importOldLedger: (old: SaveFile) => void;
 }
 
 const LedgerContext = createContext<LedgerContextValue | null>(null);
@@ -61,7 +72,7 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
   // 1) FOLLOW THE LOGIN. Logging in loads that person's ledger; logging
   //    out forgets it.
   useEffect(() => {
-    if (auth.status === "signed-in") dispatchApp({ type: "loadStarted" });
+    if (auth.status === "signed-in" && userId) dispatchApp({ type: "loadStarted", userId });
     if (auth.status === "signed-out") dispatchApp({ type: "signedOut" });
   }, [auth.status, userId]);
 
@@ -116,7 +127,16 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // 5) WARN BEFORE CLOSING while a change isn't saved yet. The browser
+  // 5) FINISH BRINGING IN THE OLD LEDGER. Its copy in this browser is
+  //    removed only once a save that includes it has worked.
+  const { importState } = state;
+  useEffect(() => {
+    if (importState !== "saved") return;
+    forgetOldLedger();
+    dispatchApp({ type: "importAcknowledged" });
+  }, [importState]);
+
+  // 6) WARN BEFORE CLOSING while a change isn't saved yet. The browser
   //    shows its own "Leave site?" question.
   const unsaved = dirty || saving;
   useEffect(() => {
@@ -139,12 +159,18 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
         saveProblem: state.saveProblem,
         saveFailures: state.saveFailures,
         clashNotice: state.clashNotice,
+        setAside: state.setAside,
+        importState,
         selectedMonth,
         setSelectedMonth,
         dispatch: dispatchApp,
         startFresh: () => dispatchApp({ type: "startFresh" }),
-        retry: () => dispatchApp({ type: "retry" }),
+        retry: () => {
+          dispatchApp({ type: "retry" });
+          setWakeUps((count) => count + 1); // also retries a reload that failed
+        },
         dismissClash: () => dispatchApp({ type: "dismissClash" }),
+        importOldLedger: (old) => dispatchApp({ type: "importOldLedger", old }),
       }}
     >
       {children}

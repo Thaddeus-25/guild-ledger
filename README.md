@@ -47,7 +47,7 @@ Do this once. The app shows "The guild archives aren't set up yet" until steps 5
 
 In the [Supabase dashboard](https://supabase.com/dashboard), in your project:
 
-1. **Create the table.** SQL Editor → paste `supabase/schema.sql` → Run. *(Already done for pixel-ledger.)*
+1. **Create the table.** SQL Editor → paste `supabase/schema.sql` → Run. *(Already done for pixel-ledger.)* Then do the same with each file in `supabase/migrations/`, in number order.
 2. **Create your account.** Authentication → Users → **Add user → Create new user**. Enter your email and a password, and tick **Auto Confirm User**.
 3. **Lock the door.** Authentication → Sign In / Providers → turn off **Allow new users to sign up**. There's no sign-up page in the app, so this stops strangers making accounts through the API.
 4. **Tell Supabase where the app lives**, so password-reset emails link back to it. Authentication → URL Configuration:

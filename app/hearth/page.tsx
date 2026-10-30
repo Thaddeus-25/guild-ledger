@@ -3,7 +3,6 @@
 import { useState } from "react";
 import PixelPanel from "@/components/PixelPanel";
 import { useAuth } from "@/lib/AuthContext";
-import { combineLedgers } from "@/lib/combineLedgers";
 import { todayISO } from "@/lib/dates";
 import { downloadText } from "@/lib/download";
 import { useLedger } from "@/lib/LedgerContext";
@@ -17,9 +16,20 @@ type Notice = { kind: "success" | "error"; text: string } | null;
 
 export default function HearthPage() {
   const { user, signOut } = useAuth();
-  const { data, dirty, saving, dispatch } = useLedger();
+  const { data, dirty, saving, importState, importOldLedger, dispatch } = useLedger();
   const oldLedger = useOldLedger();
   const [notice, setNotice] = useState<Notice>(null);
+  const [addPressed, setAddPressed] = useState(false);
+
+  // How bringing in the old ledger is going, worked out from the ledger's
+  // own state so it can't claim "done" before the save really worked.
+  const oldLedgerFound = oldLedgerCounts(oldLedger);
+  let importMessage: string | null = null;
+  if (addPressed && importState !== "none") {
+    importMessage = "Adding your old ledger to your account… It stays in this browser until it's saved online.";
+  } else if (addPressed && !oldLedgerFound) {
+    importMessage = "Your old ledger was added to your account.";
+  }
 
   async function logOut() {
     if (dirty || saving) {
@@ -33,9 +43,11 @@ export default function HearthPage() {
 
   function addOldLedger() {
     if (oldLedger.kind !== "ok") return;
-    dispatch({ type: "replaceAll", data: combineLedgers(data, oldLedger.data) });
-    forgetOldLedger();
-    setNotice({ kind: "success", text: "Your old ledger was added to your account." });
+    // The old copy is only removed from this browser once the save works
+    // (see LedgerContext). Adding it twice is harmless: nothing duplicates.
+    importOldLedger(oldLedger.data);
+    setAddPressed(true);
+    setNotice(null);
   }
 
   function downloadOldLedger() {
@@ -98,6 +110,11 @@ export default function HearthPage() {
           {notice.text}
         </p>
       )}
+      {importMessage && (
+        <p role="status" className={styles.success}>
+          {importMessage}
+        </p>
+      )}
 
       <PixelPanel title="Your guild account">
         <p>
@@ -110,7 +127,7 @@ export default function HearthPage() {
         </div>
       </PixelPanel>
 
-      {oldLedgerCounts(oldLedger) && (
+      {oldLedgerFound && (
         <PixelPanel title="A ledger from before accounts">
           <p>
             This browser still has a ledger saved from before you had an account. It isn&apos;t
@@ -121,7 +138,12 @@ export default function HearthPage() {
           )}
           <div className={styles.actions}>
             {oldLedger.kind === "ok" && (
-              <button type="button" className="button" onClick={addOldLedger}>
+              <button
+                type="button"
+                className="button"
+                onClick={addOldLedger}
+                disabled={importState !== "none"}
+              >
                 Add it to my account
               </button>
             )}

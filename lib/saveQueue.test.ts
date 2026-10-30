@@ -11,7 +11,7 @@ function run(state: AppState, ...actions: AppAction[]): AppState {
 function changed(): AppState {
   return run(
     createInitialAppState(true),
-    { type: "loadStarted" },
+    { type: "loadStarted", userId: "u1" },
     { type: "loaded", result: { kind: "ok", data: createStarterData(), version: 3 } },
     { type: "setShowRewards", value: false },
   );

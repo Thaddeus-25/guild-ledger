@@ -11,9 +11,11 @@ function fakeTable(answers: {
   select?: DbResult<LedgerRow>;
   insert?: DbResult<null>;
   update?: DbResult<{ version: number }[]>;
+  loggedIn?: boolean;
 }) {
   const calls: unknown[][] = [];
   const table: LedgerTable = {
+    hasSession: async () => answers.loggedIn ?? true,
     select: async (userId) => {
       calls.push(["select", userId]);
       return answers.select!;
@@ -31,6 +33,23 @@ function fakeTable(answers: {
 }
 
 const offline = { data: null, error: { message: "TypeError: Failed to fetch" }, status: 0 };
+
+describe("while the login can't be confirmed", () => {
+  // Without a login, the request would go out as a logged-out visitor
+  // and see no ledger at all, which would look like an empty account.
+  it("doesn't load, and reports offline so it's tried again later", async () => {
+    const { table, calls } = fakeTable({ loggedIn: false, select: { data: null, error: null, status: 200 } });
+    expect(await loadLedger(table, "u1")).toEqual({ kind: "offline" });
+    expect(calls).toEqual([]);
+  });
+
+  it("doesn't save, and reports offline so it's tried again later", async () => {
+    const { table, calls } = fakeTable({ loggedIn: false, update: { data: [], error: null, status: 200 } });
+    expect(await saveLedger(table, "u1", data, 3)).toEqual({ kind: "offline" });
+    expect(await saveLedger(table, "u1", data, null)).toEqual({ kind: "offline" });
+    expect(calls).toEqual([]);
+  });
+});
 
 describe("loadLedger", () => {
   it("reports an empty account when there's no row yet", async () => {

@@ -10,6 +10,7 @@ import { useState } from "react";
 import LoginForm from "./LoginForm";
 import PixelPanel from "./PixelPanel";
 import { useAuth } from "@/lib/AuthContext";
+import { todayISO } from "@/lib/dates";
 import { downloadText } from "@/lib/download";
 import { useLedger } from "@/lib/LedgerContext";
 import { oldLedgerCounts } from "@/lib/oldLedger";
@@ -122,12 +123,29 @@ export default function LedgerGate({ children }: { children: React.ReactNode }) 
       {ledger.clashNotice && (
         <div role="status" className={styles.notice}>
           <p>
-            Your ledger changed on another device. We loaded the newest version, so please add
-            your last change again.
+            {ledger.setAside
+              ? "Your ledger changed somewhere else, so we loaded the newest version. Your changes that weren't saved yet were set aside: download them to keep a copy, then add them again."
+              : "Your ledger changed on another device. We loaded the newest version, so please add your last change again."}
           </p>
-          <button type="button" className="button button-quiet" onClick={ledger.dismissClash}>
-            Dismiss
-          </button>
+          <div className={styles.bannerButtons}>
+            {ledger.setAside && (
+              <button
+                type="button"
+                className="button"
+                onClick={() =>
+                  downloadText(
+                    `guild-ledger-unsaved-changes-${todayISO()}.json`,
+                    JSON.stringify(ledger.setAside?.data, null, 2),
+                  )
+                }
+              >
+                Download my unsaved changes
+              </button>
+            )}
+            <button type="button" className="button button-quiet" onClick={ledger.dismissClash}>
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
 
