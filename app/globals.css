@@ -97,6 +97,43 @@ a {
   background: var(--parchment-dark);
 }
 
+/* ---------- Form fields ---------- */
+/* Shared by every form: a label, an input, and an error underneath. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-weight: 700;
+}
+
+.field-hint {
+  font-size: 0.9rem;
+  color: var(--wood);
+}
+
+.field-input {
+  min-height: 44px;
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: #fffaf0;
+  border: var(--px) solid var(--wood-dark);
+  border-radius: 0;
+}
+
+.field-input[aria-invalid="true"] {
+  border-color: var(--amber);
+}
+
+.field-error {
+  color: #8a3f00; /* dark amber, readable on parchment */
+  font-weight: 700;
+}
+
 /* ---------- Page layout ---------- */
 .page {
   max-width: 960px;

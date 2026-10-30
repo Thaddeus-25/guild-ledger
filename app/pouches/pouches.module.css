@@ -1,0 +1,41 @@
+.blurb {
+  margin-bottom: 12px;
+}
+
+.list {
+  list-style: none;
+  margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px 0;
+  border-bottom: 2px dashed var(--parchment-dark);
+}
+
+.name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.limit {
+  color: var(--wood);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pushes the Edit/Delete buttons to the right edge. */
+.rowActions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.blocked {
+  flex-basis: 100%;
+  padding: 8px 12px;
+  background: var(--parchment-dark);
+  border-left: var(--px) solid var(--amber);
+}
