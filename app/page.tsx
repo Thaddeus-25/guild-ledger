@@ -6,6 +6,7 @@ import ClerkMessage from "@/components/ClerkMessage";
 import MonthPicker from "@/components/MonthPicker";
 import PixelIcon from "@/components/PixelIcon";
 import PixelPanel from "@/components/PixelPanel";
+import RankBadge from "@/components/RankBadge";
 import SummaryCard from "@/components/SummaryCard";
 import TransactionList from "@/components/TransactionList";
 import { monthTotals, monthTransactions, pouchUsage, unlimitedSpending } from "@/lib/budget";
@@ -39,6 +40,8 @@ export default function GuildHallPage() {
     <>
       <h1 className="page-title">Guild Hall</h1>
       <p className="page-subtitle">Your month at a glance</p>
+
+      {data.settings.showRewards && <RankBadge stamps={data.logbookDays.length} />}
 
       <MonthPicker />
       <ClerkMessage message={message} />
