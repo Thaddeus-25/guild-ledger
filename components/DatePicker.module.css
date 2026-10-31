@@ -1,0 +1,87 @@
+.group {
+  margin-bottom: 16px;
+}
+
+/* "Fri, Oct 30, 2026" under the chips. */
+.chosenText {
+  width: 100%;
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: var(--wood);
+}
+
+.calendar {
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.monthBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.monthName {
+  font-family: var(--font-pixel), monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.arrow {
+  width: 44px;
+  height: 44px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--parchment-dark);
+  border: 3px solid var(--wood-dark);
+  cursor: pointer;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+}
+
+.grid th {
+  padding-bottom: 2px;
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--wood);
+}
+
+.day {
+  width: 100%;
+  min-height: 40px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: #fffaf0;
+  border: 2px solid var(--parchment-dark);
+  cursor: pointer;
+}
+
+.today {
+  border-color: var(--wood-dark);
+}
+
+.picked {
+  background: var(--gold);
+  border-color: var(--wood-dark);
+  font-weight: 700;
+}
+
+/* Days after today: still allowed, just quieter. */
+.future:not(.picked) {
+  color: #7a6a4f;
+}
+
+.hint {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--wood);
+}

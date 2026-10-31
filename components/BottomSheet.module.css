@@ -1,0 +1,72 @@
+/* The dialog fills the bottom of the screen; its ::backdrop dims the page. */
+.sheet {
+  width: 100%;
+  max-width: min(480px, 100%);
+  max-height: 90dvh;
+  margin: auto auto 0; /* stick to the bottom, centred on wide screens */
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.sheet::backdrop {
+  background: rgb(10 14 26 / 0.6);
+}
+
+.panel {
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain; /* swipes stay inside the sheet */
+  padding: 8px 16px calc(16px + env(safe-area-inset-bottom)); /* clear the iPhone home bar */
+  background: var(--parchment);
+  border-top: var(--px) solid var(--wood-dark);
+  box-shadow: 0 calc(var(--px) * -2) 0 0 var(--gold);
+  animation: slide-up 180ms ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.grab {
+  width: 48px;
+  height: 6px;
+  margin: 0 auto 8px;
+  background: var(--wood);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.2rem;
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--parchment-dark);
+  border: 3px solid var(--wood-dark);
+  cursor: pointer;
+}
+
+/* Inside the parchment, the gold focus ring is too faint, so use dark wood. */
+.panel :focus-visible {
+  outline-color: var(--wood-dark);
+}

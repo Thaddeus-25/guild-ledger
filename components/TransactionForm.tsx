@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
+import DatePicker from "./DatePicker";
 import { todayISO } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
@@ -117,16 +118,11 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
       </div>
 
       <div className="field">
-        <label className="field-label" htmlFor={`${formId}-date`}>
-          Date
-        </label>
-        <input
+        <DatePicker
           id={`${formId}-date`}
-          className="field-input"
-          type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
-          {...errorProps("date")}
+          onChange={setDate}
+          errorId={errors.date ? `${formId}-date-error` : undefined}
         />
         {errorMessage("date")}
       </div>
