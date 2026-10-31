@@ -32,8 +32,10 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
 
 ### BottomSheet (shared)
 - A panel that slides up from the bottom over a dimmed page, built on a modal `<dialog>` (`showModal()`), styled entirely by us: a parchment panel, a dark-wood top border with a gold line, and a small grab bar.
-- It has a visible title (an `h2` inside the sheet, also its accessible name).
-- It closes on Esc, on the Android back gesture (the dialog's `cancel`/`close`), and on a tap on the dimmed area outside the panel. When it closes, focus returns to the control that opened it.
+- It has a visible title (an `h2` inside the sheet, also its accessible name) and a **✕ Close** button (labelled "Close", 44px) at the top right. iPhones have no back gesture that closes things, so every sheet needs a visible way out.
+- It closes on the Close button, Esc, the Android back gesture (the dialog's `cancel`/`close`), and a tap on the dimmed area outside the panel. When it closes, focus returns to the control that opened it.
+- While a sheet is open, the page behind it can't scroll (`overflow: hidden` on `<html>`), so swiping inside the sheet never scrolls the form.
+- The bottom padding includes the phone's safe area (`env(safe-area-inset-bottom)`), so nothing sits under the iPhone home bar. The viewport is set to `viewport-fit=cover` so that value is available.
 - On phones it spans the screen width. On wider screens it's at most 480px wide and centred at the bottom.
 - With `prefers-reduced-motion: reduce`, it appears without sliding.
 - Only one sheet is open at a time.
@@ -71,6 +73,7 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
 ### Amount (`AmountInput`)
 - It's a real text input that doesn't call up the phone keyboard (`inputMode="none"`), showing the amount string in the readable font with `$` before it. It keeps the existing label, hint, `aria-invalid` and error message.
 - **Opening the pad:** a tap or click on the input opens the pad sheet. Focusing it with Tab does not, so keyboard users can type straight in.
+- On touch screens (`(pointer: coarse)`), the input is also `readOnly`, because iPhones don't reliably honor `inputMode="none"` and could show their keyboard over the pad. With a mouse and keyboard it stays editable.
 - **Pad sheet** (title "Enter the amount"), top to bottom:
   - the big amount (`$` + the string, or `$0` when empty), which is an `aria-live="polite"` region;
   - the coin buttons `+1` `+5` `+10` `+20`, each with a coin icon, labelled "Add 1 dollar" and so on;
@@ -112,7 +115,10 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
 
 **Components (each with a `.module.css`):** `components/BottomSheet.tsx`, `DatePicker.tsx`, `PouchPicker.tsx`, `AmountInput.tsx`, `PixelCheckbox.tsx`. Each takes `value` and `onChange` (plus `id`, label text and error props where the field has them) and keeps no copy of the value. The form still owns the state.
 
+**iPhone home-screen icon:** `app/apple-icon.png`, 180×180, the favicon coin on the night-blue background (iPhones ignore the manifest's icons and don't show transparency). Next.js links it automatically.
+
 **Changed:**
+- `app/layout.tsx` (`viewportFit: "cover"`);
 - `components/TransactionForm.tsx` (date, amount, pouch);
 - `components/CategoryForm.tsx` (limit);
 - `app/hearth/page.tsx` (rewards checkbox);
