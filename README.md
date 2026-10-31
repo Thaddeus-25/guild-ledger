@@ -101,6 +101,13 @@ supabase/       the database setup (schema.sql)
 docs/superpowers/ the design spec and the step-by-step build plan
 ```
 
+## Pixel art rules
+
+- **Pouch icons are 16×16**, drawn as text grids in `lib/icons.ts` (one letter per pixel, `.` for see-through). They're shown small (24–48px), where 16×16 stays crisp. Add new names to `ICON_NAMES` in `lib/types.ts`; `npm test` checks every grid's size and colors.
+- **Bigger artwork uses 32×32 or larger**: the favicon, a future home-screen app icon, banners, rank badges and Quest trophies.
+- **Never mix grid sizes side by side.** Icons from different grids have different-sized "pixels" and look like two art styles.
+- Use the shared palette in `ICON_COLORS` so everything matches.
+
 ## Planned for later
 
 - **Quests:** savings goals with progress, for example "Save $500 for a new cloak".
