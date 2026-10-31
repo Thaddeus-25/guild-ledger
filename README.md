@@ -83,11 +83,18 @@ app/            pages: one folder per web address
   reset-password/ choose a new password (from the reset email)
   globals.css     colors, buttons, form fields shared by every page
 components/     reusable pieces: NavBar, PixelPanel, PixelIcon, BudgetBar, forms…
+  BottomSheet.tsx   the slide-up panel used by the pickers
+  DatePicker.tsx    Today / Yesterday / Other day… and the pixel calendar
+  PouchPicker.tsx   the Coin Pouch list with icons and what's left
+  AmountInput.tsx   the number pad with coin buttons
+  PixelCheckbox.tsx the gold pixel checkbox
 lib/            logic with no screen code, each file with its own .test.ts
   types.ts        the shape of the saved data
   money.ts        cents <-> "$12.50" (money is always stored as whole cents)
   dates.ts        "YYYY-MM-DD" date helpers (no time-zone surprises)
   budget.ts       monthly totals and pouch limits
+  calendar.ts     the date picker's calendar maths (weeks start on Sunday)
+  amountPad.ts    the number pad's rules (2 decimals, $1,000,000 cap)
   validation.ts   checks for the entry and pouch forms
   storage.ts      checking saved data; reading the old browser ledger
   remoteStore.ts  loading and saving in Supabase (with version checks)

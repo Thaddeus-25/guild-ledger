@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import PixelCheckbox from "@/components/PixelCheckbox";
 import PixelPanel from "@/components/PixelPanel";
 import { useAuth } from "@/lib/AuthContext";
 import { todayISO } from "@/lib/dates";
@@ -184,15 +185,13 @@ export default function HearthPage() {
       </PixelPanel>
 
       <PixelPanel title="Rewards">
-        <label className={styles.checkbox}>
-          <input
-            type="checkbox"
-            checked={data.settings.showRewards}
-            onChange={(e) => dispatch({ type: "setShowRewards", value: e.target.checked })}
-            aria-describedby="rewards-help"
-          />
-          <span>Show rewards (Logbook stamps and Guild rank)</span>
-        </label>
+        <PixelCheckbox
+          checked={data.settings.showRewards}
+          onChange={(value) => dispatch({ type: "setShowRewards", value })}
+          describedBy="rewards-help"
+        >
+          Show rewards (Logbook stamps and Guild rank)
+        </PixelCheckbox>
         <p id="rewards-help" className="field-hint">
           Earn one stamp for each day you record an entry. Stamps never go away.
         </p>

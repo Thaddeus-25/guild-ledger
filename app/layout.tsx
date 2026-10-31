@@ -24,8 +24,11 @@ export const metadata: Metadata = {
 };
 
 // Colors the phone's status bar to match the night-blue background.
+// viewportFit "cover" lets the bottom sheets measure the iPhone home bar
+// (env(safe-area-inset-bottom)) so nothing hides underneath it.
 export const viewport: Viewport = {
   themeColor: "#1f2a44",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -13,6 +13,8 @@
     rgb(0 0 0 / 0.18) 14px 16px
   );
   border-top: var(--px) solid var(--wood-dark);
+  /* Room for the iPhone home bar, so the tabs aren't underneath it. */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .brand {

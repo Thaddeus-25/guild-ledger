@@ -1,0 +1,48 @@
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* The real checkbox: invisible, but covering the square so taps land on it. */
+.input {
+  position: absolute;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  background: #fffaf0;
+  border: 3px solid var(--wood-dark);
+}
+
+.box svg {
+  fill: var(--ink);
+  visibility: hidden;
+}
+
+.input:checked + .box {
+  background: var(--gold);
+}
+
+.input:checked + .box svg {
+  visibility: visible;
+}
+
+.input:focus-visible + .box {
+  outline: 3px solid var(--wood-dark);
+  outline-offset: 3px;
+}
