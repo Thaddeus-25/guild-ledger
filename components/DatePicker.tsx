@@ -65,13 +65,21 @@ export default function DatePicker({ id, value, onChange, errorId }: DatePickerP
         <span>Yesterday</span>
       </label>
       <label className="choice">
-        {/* onClick (not onChange) so tapping it again reopens the calendar. */}
+        {/* onClick (not onChange) so tapping it again reopens the calendar.
+            Space or Enter on it does the same: browsers send no click for a
+            radio button that's already chosen, so keyboard users need this. */}
         <input
           type="radio"
           name={`${id}-day`}
           checked={choice === "other"}
           onChange={() => {}}
           onClick={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === " " || event.key === "Enter") {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
         />
         <span>{choice === "other" ? formatShortDay(value) : "Other day…"}</span>
       </label>
