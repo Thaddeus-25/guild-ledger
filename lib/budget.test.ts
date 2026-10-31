@@ -5,6 +5,7 @@ import {
   filledSegments,
   monthTotals,
   monthTransactions,
+  pouchLeftText,
   pouchUsage,
   unlimitedSpending,
 } from "./budget";
@@ -136,5 +137,34 @@ describe("budgetBarText", () => {
 
   it("says how far over, without a minus sign", () => {
     expect(budgetBarText(usageFor(11240))).toBe("Over by $12.40");
+  });
+});
+
+describe("pouchLeftText", () => {
+  const provisions = pouches.find((c) => c.id === "provisions")!; // $100 limit
+  const tavern = pouches.find((c) => c.id === "tavern")!; // no limit
+  const wages = pouches.find((c) => c.id === "wages")!; // income
+
+  it("says how much is left this month", () => {
+    const entries = [entry("expense", 8800, "2026-10-03", "provisions"), entry("expense", 5000, "2026-09-03", "provisions")];
+    expect(pouchLeftText(provisions, entries, "2026-10")).toEqual({ text: "$12.00 left", tone: "good" });
+  });
+
+  it("says $0.00 left exactly at the limit", () => {
+    const entries = [entry("expense", 10000, "2026-10-03", "provisions")];
+    expect(pouchLeftText(provisions, entries, "2026-10")).toEqual({ text: "$0.00 left", tone: "at" });
+  });
+
+  it("says how much over, calmly", () => {
+    const entries = [entry("expense", 10500, "2026-10-03", "provisions")];
+    expect(pouchLeftText(provisions, entries, "2026-10")).toEqual({ text: "$5.00 over", tone: "over" });
+  });
+
+  it("says no limit for an expense pouch without one", () => {
+    expect(pouchLeftText(tavern, [], "2026-10")).toEqual({ text: "no limit", tone: "none" });
+  });
+
+  it("says nothing for an income pouch", () => {
+    expect(pouchLeftText(wages, [], "2026-10")).toBeNull();
   });
 });

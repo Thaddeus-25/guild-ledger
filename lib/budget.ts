@@ -103,3 +103,18 @@ export function budgetBarText(usage: PouchUsage): string {
   if (usage.status === "over") return `Over by ${formatCents(-usage.leftCents)}`;
   return `${formatCents(usage.spentCents)} of ${formatCents(usage.limitCents)} used · ${formatCents(usage.leftCents)} left`;
 }
+
+// The words next to a pouch in the Coin Pouch picker, for one month.
+// Calm wording: never shame spending. Income pouches have no limit to show.
+export function pouchLeftText(
+  category: Category,
+  transactions: Transaction[],
+  month: string,
+): { text: string; tone: "good" | "at" | "over" | "none" } | null {
+  if (category.type === "income") return null;
+  if (category.monthlyLimitCents === undefined) return { text: "no limit", tone: "none" };
+
+  const leftCents = category.monthlyLimitCents - spentInPouch(transactions, category.id, month);
+  if (leftCents < 0) return { text: `${formatCents(-leftCents)} over`, tone: "over" };
+  return { text: `${formatCents(leftCents)} left`, tone: leftCents === 0 ? "at" : "good" };
+}
