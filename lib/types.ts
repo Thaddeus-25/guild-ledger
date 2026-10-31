@@ -17,6 +17,54 @@ export const ICON_NAMES = [
   "heart",
   "book",
   "sword",
+  // Added 2026-10-30: everyday spending
+  "apple",
+  "candle",
+  "bucket",
+  "hammer",
+  "cloak",
+  "soap",
+  // Getting around and staying in touch
+  "horse",
+  "cart",
+  "lantern",
+  "crystal",
+  "bird",
+  // Health and wellbeing
+  "herb",
+  "cross",
+  "dumbbell",
+  "bed",
+  // Fun and treats
+  "lute",
+  "dice",
+  "cake",
+  "teacup",
+  "mask",
+  // People and giving
+  "gift",
+  "paw",
+  "baby",
+  "hands",
+  "quill",
+  // Bills
+  "key",
+  "shield",
+  "crown",
+  "chain",
+  "hourglass",
+  // Income
+  "anvil",
+  "bag",
+  "wheat",
+  "ring",
+  "arrow",
+  "star",
+  // Goals (for Quests later)
+  "map",
+  "flag",
+  "trophy",
+  "compass",
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];
