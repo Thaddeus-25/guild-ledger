@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Design mockups and work-in-progress notes from Claude sessions
+.superpowers/
