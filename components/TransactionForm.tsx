@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import DatePicker from "./DatePicker";
-import { todayISO } from "@/lib/dates";
+import PouchPicker from "./PouchPicker";
+import { monthOf, todayISO } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
 import { centsToInput } from "@/lib/money";
@@ -128,23 +129,16 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
       </div>
 
       <div className="field">
-        <label className="field-label" htmlFor={`${formId}-pouch`}>
-          Coin Pouch
-        </label>
-        <select
+        <PouchPicker
           id={`${formId}-pouch`}
-          className="field-input"
+          type={type}
+          pouches={pouchesOfType}
+          transactions={data.transactions}
+          month={monthOf(date)}
           value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          {...errorProps("categoryId")}
-        >
-          <option value="">Choose a pouch…</option>
-          {pouchesOfType.map((pouch) => (
-            <option key={pouch.id} value={pouch.id}>
-              {pouch.name}
-            </option>
-          ))}
-        </select>
+          onChange={setCategoryId}
+          errorId={errors.categoryId ? `${formId}-categoryId-error` : undefined}
+        />
         {errorMessage("categoryId")}
       </div>
 
