@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDollars, pressKey, type PadKey } from "./amountPad";
+import { addDollars, finishAmount, pressKey, pressKeyFresh, type PadKey } from "./amountPad";
 
 // Presses several keys one after another, starting from an empty amount.
 function type(...keys: PadKey[]): string {
@@ -69,5 +69,32 @@ describe("addDollars", () => {
   it("leaves a half-typed or unusual amount alone", () => {
     expect(addDollars("12.", 5)).toBe("12.");
     expect(addDollars("$12", 5)).toBe("$12");
+  });
+});
+
+describe("pressKeyFresh", () => {
+  it("starts a new amount when the pad opens on a finished one", () => {
+    expect(pressKeyFresh("12.50", "5", true)).toBe("5");
+    expect(pressKeyFresh("12.50", ".", true)).toBe("0.");
+  });
+
+  it("deletes normally, even on a fresh pad", () => {
+    expect(pressKeyFresh("12.50", "back", true)).toBe("12.5");
+  });
+
+  it("types normally once you've started", () => {
+    expect(pressKeyFresh("5", "2", false)).toBe("52");
+  });
+});
+
+describe("finishAmount", () => {
+  it("drops a dot left at the end, so the amount can be saved", () => {
+    expect(finishAmount("12.")).toBe("12");
+    expect(finishAmount("0.")).toBe("0");
+  });
+
+  it("leaves a finished amount alone", () => {
+    expect(finishAmount("12.5")).toBe("12.5");
+    expect(finishAmount("")).toBe("");
   });
 });

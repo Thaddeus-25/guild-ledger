@@ -42,17 +42,17 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
 
 ### Date (`DatePicker`)
 - Label "Date". There are three chips in a row (a radio group): `Today`, `Yesterday`, `Other day…`, at least 44px tall, with the chosen one gold.
-- The full chosen date is written under the chips with the v1 `formatDay` helper (e.g. "Fri 30 Oct 2026").
+- The full chosen date is written under the chips (e.g. "Fri, Oct 30, 2026"). All dates use US style, like the rest of the app.
 - Picking a chip:
   - **Today:** `todayISO()`.
   - **Yesterday:** the day before today.
   - **Other day…:** opens the calendar sheet; the value doesn't change until a day is picked.
-- When the value is neither today nor yesterday, the third chip is the lit one and reads the short date (e.g. `Tue 20 Oct`) instead of "Other day…". Tapping it opens the calendar again.
+- When the value is neither today nor yesterday, the third chip is the lit one and reads the short date (e.g. `Tue, Oct 20`) instead of "Other day…". Tapping it opens the calendar again.
 - **Calendar sheet** (title "Choose a day"):
   - The header has ◀ and ▶ buttons (labelled "Previous month" / "Next month") around the month name (v1 `formatMonth`).
   - Below it are 7 columns, `Su Mo Tu We Th Fr Sa`, and the weeks of that month. Days outside the month are blank.
   - The calendar opens on the month of the current value.
-  - Each day is a button, at least 40px wide and 36px tall, labelled with the full date (e.g. "Friday, 30 October 2026").
+  - Each day is a button, at least 40px wide and 36px tall, labelled with the full date (e.g. "Friday, October 30, 2026").
   - Today has a dark outline (`aria-current="date"`). The chosen day is gold (`aria-pressed="true"`). Days after today are faded but can be picked.
   - **Tapping a day sets the value and closes the sheet.**
   - **Keyboard:** only the chosen day (or the 1st when the chosen day is in another month) is in the Tab order. Arrow keys move one day or one week and cross into neighbouring months; Home and End go to the start and end of the week; Enter or Space picks.
@@ -62,7 +62,7 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
 - Label "Coin Pouch". The box is a button showing the chosen pouch's icon (24px), its name, and its "left" text, or "Choose a pouch…" when none is chosen, with a ▲.
 - **Sheet** (title "Choose a Coin Pouch"):
   - It has one row per pouch of the entry's type (Expense or Income), in the user's pouch order: icon (28px), name, and on the right the "left" text.
-  - Rows are real radio buttons, visually hidden behind the styled row, with a gold row for the chosen one. **Tapping a row picks it and closes the sheet.** Arrow keys move between rows (native radio behavior); Enter or Space picks and closes.
+  - Rows are real radio buttons, visually hidden behind the styled row, with a gold row for the chosen one. **Tapping a row picks it and closes the sheet.** Arrow keys move between rows and choose as they go, but keep the sheet open; Enter or Space picks and closes (also on the already-chosen row).
 - **"Left" text** is for the month of the entry's date, counting all saved entries, including the one being edited:
   - an expense pouch with a limit shows `"$12.00 left"` (green), `"$0.00 left"` (brown) exactly at the limit, or `"$5.00 over"` (calm amber, never red);
   - an expense pouch without a limit shows `"no limit"`;
@@ -79,7 +79,9 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
   - the coin buttons `+1` `+5` `+10` `+20`, each with a coin icon, labelled "Add 1 dollar" and so on;
   - the keys `1–9`, `.`, `0`, `⌫` (labelled "Delete"), at least 44px tall;
   - **Done**, which closes the sheet.
-- While the sheet is open, the physical keys `0–9`, `.`, `,` (treated as `.`), Backspace and Enter (Done) work too.
+- While the sheet is open, the physical keys `0–9`, `.`, `,` (treated as `.`), Backspace and Enter work too. Enter always means Done, even right after clicking a key.
+- When the pad opens on an existing amount (e.g. "12.50" when editing), the first digit or `.` starts a new amount, like a calculator; ⌫ and the coin buttons work on the existing amount.
+- However the pad closes, a trailing `.` is dropped ("12." becomes "12"), so it can be saved.
 - **Key rules** (`lib/amountPad.ts`):
   - A `.` with nothing before it gives `"0."`. A second `.` is ignored.
   - A third decimal digit is ignored.
@@ -107,10 +109,10 @@ Mockups: `.superpowers/brainstorm/` (git-ignored), final screen `new-entry-final
   - `addDays(date: string, days: number): string`.
   - `yesterdayISO(today: string): string`.
   - `dayChoice(date: string, today: string): "today" | "yesterday" | "other"`.
-  - `formatShortDay(date: string): string` gives `"Tue 20 Oct"`.
-  - `formatLongDay(date: string): string` gives `"Tuesday, 20 October 2026"`.
+  - `formatShortDay(date: string): string` gives `"Tue, Oct 20"`; `formatChosenDay` gives `"Fri, Oct 30, 2026"`.
+  - `formatLongDay(date: string): string` gives `"Tuesday, October 20, 2026"`.
   - All date maths uses `new Date(y, m - 1, d)` like v1, never `new Date("YYYY-MM-DD")`.
-- `lib/amountPad.ts`: `type PadKey = "0" | … | "9" | "." | "back"`; `pressKey(current: string, key: PadKey): string`; `addDollars(current: string, dollars: number): string`. It's built on `parseAmount`, `centsToInput` and `MAX_AMOUNT_CENTS` from `lib/money.ts`.
+- `lib/amountPad.ts`: `type PadKey = "0" | … | "9" | "." | "back"`; `pressKey(current: string, key: PadKey): string`; `addDollars(current: string, dollars: number): string`; `pressKeyFresh(current, key, fresh)`; `finishAmount(current)`. It's built on `parseAmount`, `centsToInput` and `MAX_AMOUNT_CENTS` from `lib/money.ts`.
 - `lib/budget.ts`: adds `pouchLeftText(category: Category, transactions: Transaction[], month: string): { text: string; tone: "good" | "at" | "over" | "none" } | null`, which is `null` for income pouches.
 
 **Components (each with a `.module.css`):** `components/BottomSheet.tsx`, `DatePicker.tsx`, `PouchPicker.tsx`, `AmountInput.tsx`, `PixelCheckbox.tsx`. Each takes `value` and `onChange` (plus `id`, label text and error props where the field has them) and keeps no copy of the value. The form still owns the state.

@@ -10,7 +10,7 @@
 import { useState, useSyncExternalStore } from "react";
 import BottomSheet from "./BottomSheet";
 import PixelIcon from "./PixelIcon";
-import { addDollars, pressKey, type PadKey } from "@/lib/amountPad";
+import { addDollars, finishAmount, pressKeyFresh, type PadKey } from "@/lib/amountPad";
 import styles from "./AmountInput.module.css";
 
 type AmountInputProps = {
@@ -50,19 +50,11 @@ export default function AmountInput(props: AmountInputProps) {
     () => false, // while pre-rendering on the server
   );
 
-  function press(key: PadKey) {
-    onChange(pressKey(value, key));
-  }
-
-  // Real keyboard keys work while the pad is open, too.
-  function handleKeyDown(event: React.KeyboardEvent) {
-    const onButton = (event.target as HTMLElement).tagName === "BUTTON";
-    if (/^[0-9]$/.test(event.key)) press(event.key as PadKey);
-    else if (event.key === "." || event.key === ",") press(".");
-    else if (event.key === "Backspace") press("back");
-    else if (event.key === "Enter" && !onButton) setOpen(false);
-    else return;
-    event.preventDefault();
+  // However the pad closes (Done, ✕, Esc, a tap outside), tidy the amount:
+  // "12." can't be saved, so it becomes "12".
+  function close() {
+    onChange(finishAmount(value));
+    setOpen(false);
   }
 
   return (
@@ -82,45 +74,82 @@ export default function AmountInput(props: AmountInputProps) {
         aria-haspopup="dialog"
       />
 
-      <BottomSheet open={open} title={sheetTitle} onClose={() => setOpen(false)}>
-        <div className={styles.pad} onKeyDown={handleKeyDown}>
-          <p className={styles.total} aria-live="polite">
-            ${value || "0"}
-          </p>
-
-          <div className={styles.coins}>
-            {COINS.map((dollars) => (
-              <button
-                key={dollars}
-                type="button"
-                className={styles.coin}
-                aria-label={`Add ${dollars} ${dollars === 1 ? "dollar" : "dollars"}`}
-                onClick={() => onChange(addDollars(value, dollars))}
-              >
-                <PixelIcon name="coin" size={20} />+{dollars}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.keys}>
-            {KEYS.map(({ key, label, name }) => (
-              <button
-                key={key}
-                type="button"
-                className={`${styles.key} ${name ? styles.keyAlt : ""}`}
-                aria-label={name}
-                onClick={() => press(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <button type="button" className={styles.done} data-autofocus="" onClick={() => setOpen(false)}>
-            Done
-          </button>
-        </div>
+      <BottomSheet open={open} title={sheetTitle} onClose={close}>
+        <Pad value={value} onChange={onChange} onDone={close} />
       </BottomSheet>
     </>
+  );
+}
+
+type PadProps = {
+  value: string;
+  onChange: (value: string) => void;
+  onDone: () => void;
+};
+
+// The pad itself. It's built fresh each time the sheet opens, so "fresh"
+// starts true: the first digit replaces an amount that was already there.
+function Pad({ value, onChange, onDone }: PadProps) {
+  const [fresh, setFresh] = useState(value !== "");
+
+  function press(key: PadKey) {
+    onChange(pressKeyFresh(value, key, fresh));
+    setFresh(false);
+  }
+
+  function addCoin(dollars: number) {
+    onChange(addDollars(value, dollars));
+    setFresh(false);
+  }
+
+  // Real keyboard keys work while the pad is open, too. Enter always means
+  // Done, even after clicking a key (otherwise Enter would press it again).
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (/^[0-9]$/.test(event.key)) press(event.key as PadKey);
+    else if (event.key === "." || event.key === ",") press(".");
+    else if (event.key === "Backspace") press("back");
+    else if (event.key === "Enter") onDone();
+    else return;
+    event.preventDefault();
+  }
+
+  return (
+    <div className={styles.pad} onKeyDown={handleKeyDown}>
+      <p className={styles.total} aria-live="polite">
+        ${value || "0"}
+      </p>
+
+      <div className={styles.coins}>
+        {COINS.map((dollars) => (
+          <button
+            key={dollars}
+            type="button"
+            className={styles.coin}
+            aria-label={`Add ${dollars} ${dollars === 1 ? "dollar" : "dollars"}`}
+            onClick={() => addCoin(dollars)}
+          >
+            <PixelIcon name="coin" size={20} />+{dollars}
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.keys}>
+        {KEYS.map(({ key, label, name }) => (
+          <button
+            key={key}
+            type="button"
+            className={`${styles.key} ${name ? styles.keyAlt : ""}`}
+            aria-label={name}
+            onClick={() => press(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <button type="button" className={styles.done} data-autofocus="" onClick={onDone}>
+        Done
+      </button>
+    </div>
   );
 }

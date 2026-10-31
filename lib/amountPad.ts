@@ -46,3 +46,16 @@ export function addDollars(current: string, dollars: number): string {
   const cents = Math.min(centsOf(current) + dollars * 100, MAX_AMOUNT_CENTS);
   return centsToInput(cents);
 }
+
+// When the pad opens on an amount that's already there (like "12.50" when
+// editing), the first digit starts a new amount, like a calculator.
+// Deleting still works on the old amount.
+export function pressKeyFresh(current: string, key: PadKey, fresh: boolean): string {
+  if (fresh && key !== "back") return pressKey("", key);
+  return pressKey(current, key);
+}
+
+// When the pad closes: "12." can't be saved, so it becomes "12".
+export function finishAmount(current: string): string {
+  return current.endsWith(".") ? current.slice(0, -1) : current;
+}

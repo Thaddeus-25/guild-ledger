@@ -84,11 +84,18 @@ export default function PouchPicker(props: PouchPickerProps) {
                     value={pouch.id}
                     checked={pouch.id === value}
                     data-autofocus={startHere ? "" : undefined}
-                    onChange={() => pick(pouch.id)}
-                    // Tapping the pouch that's already chosen just closes the sheet.
-                    onClick={() => pouch.id === value && setOpen(false)}
+                    // Arrow keys choose the next pouch but keep the list
+                    // open, so you can move through it one row at a time.
+                    onChange={() => onChange(pouch.id)}
+                    // A tap or click (detail > 0) picks and closes. Arrow
+                    // keys also send a click, but with detail 0.
+                    onClick={(event) => {
+                      if (event.detail > 0) pick(pouch.id);
+                    }}
+                    // Enter or Space picks and closes, even on the pouch
+                    // that's already chosen (which sends no click).
                     onKeyDown={(event) => {
-                      if (event.key === "Enter") {
+                      if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         pick(pouch.id);
                       }
