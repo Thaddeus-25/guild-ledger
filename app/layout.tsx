@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Next, Pixelify_Sans } from "next/font/google";
 import LedgerGate from "@/components/LedgerGate";
 import NavBar from "@/components/NavBar";
@@ -21,6 +21,11 @@ const bodyFont = Atkinson_Hyperlegible_Next({
 export const metadata: Metadata = {
   title: "Guild Ledger",
   description: "A cozy budgeting ledger for adventurers.",
+};
+
+// Colors the phone's status bar to match the night-blue background.
+export const viewport: Viewport = {
+  themeColor: "#1f2a44",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
