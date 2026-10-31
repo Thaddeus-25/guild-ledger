@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
+import AmountInput from "./AmountInput";
 import DatePicker from "./DatePicker";
 import PouchPicker from "./PouchPicker";
 import { monthOf, todayISO } from "@/lib/dates";
@@ -106,13 +107,13 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
         <label className="field-label" htmlFor={`${formId}-amount`}>
           Amount in dollars
         </label>
-        <input
+        <AmountInput
           id={`${formId}-amount`}
           className={`field-input ${styles.amount}`}
-          inputMode="decimal"
+          sheetTitle="Enter the amount"
           placeholder="e.g. 12.50"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={setAmount}
           {...errorProps("amount")}
         />
         {errorMessage("amount")}

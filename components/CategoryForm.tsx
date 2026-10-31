@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import AmountInput from "./AmountInput";
 import PixelIcon from "./PixelIcon";
 import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
@@ -77,13 +78,13 @@ export default function CategoryForm({ type, initial, onDone }: CategoryFormProp
           <span className="field-hint" id={`${formId}-limit-hint`}>
             Leave empty for no limit.
           </span>
-          <input
+          <AmountInput
             id={`${formId}-limit`}
             className="field-input"
-            inputMode="decimal"
+            sheetTitle="Monthly limit"
             placeholder="e.g. 200"
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={setLimit}
             aria-invalid={errors.limit ? true : undefined}
             aria-describedby={`${formId}-limit-hint${errors.limit ? ` ${formId}-limit-error` : ""}`}
           />
