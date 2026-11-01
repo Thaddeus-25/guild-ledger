@@ -1,0 +1,28 @@
+/* The mimic's shut-eye layer: hidden most of the time, shown for a blink every 4 seconds.
+   steps() makes it snap on and off like a sprite frame instead of fading. */
+.blink {
+  visibility: hidden;
+  animation: blink 4s steps(1, end) infinite;
+}
+
+@keyframes blink {
+  0%,
+  88% {
+    visibility: hidden;
+  }
+  92%,
+  95% {
+    visibility: visible;
+  }
+  96%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+/* People who turn off motion in their device settings see the mimic still, eyes open. */
+@media (prefers-reduced-motion: reduce) {
+  .blink {
+    animation: none;
+  }
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { chestState } from "./chest";
-import { CHEST_ART, CHEST_COLORS } from "./chestArt";
+import { CHEST_ART, CHEST_COLORS, MIMIC_BLINK } from "./chestArt";
 
 describe("chestState", () => {
   it("picks the state from the share of income left", () => {
@@ -28,12 +28,17 @@ describe("chestState", () => {
 
 describe("chest art", () => {
   it("is 32×32 and only uses known colors", () => {
-    for (const rows of Object.values(CHEST_ART)) {
+    for (const rows of [...Object.values(CHEST_ART), MIMIC_BLINK]) {
       expect(rows).toHaveLength(32);
       for (const row of rows) {
         expect(row).toHaveLength(32);
         for (const letter of row) if (letter !== ".") expect(CHEST_COLORS[letter]).toBeDefined();
       }
     }
+  });
+
+  it("blinks by changing only the mimic's eyes", () => {
+    const changedRows = MIMIC_BLINK.flatMap((row, y) => (row === CHEST_ART.overspent[y] ? [] : [y]));
+    expect(changedRows).toEqual([14, 15]);
   });
 });
