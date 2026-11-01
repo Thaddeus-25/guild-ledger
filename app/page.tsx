@@ -9,7 +9,9 @@ import PixelPanel from "@/components/PixelPanel";
 import RankBadge from "@/components/RankBadge";
 import SummaryCard from "@/components/SummaryCard";
 import TransactionList from "@/components/TransactionList";
+import TreasuryChest from "@/components/TreasuryChest";
 import { monthTotals, monthTransactions, pouchUsage, unlimitedSpending } from "@/lib/budget";
+import { chestState } from "@/lib/chest";
 import { clerkMessage } from "@/lib/clerk";
 import { todayISO } from "@/lib/dates";
 import { newestFirst } from "@/lib/entries";
@@ -53,7 +55,7 @@ export default function GuildHallPage() {
           title="Gold remaining"
           plain="Income minus expenses"
           cents={totals.remainingCents}
-          icon="gem"
+          icon={<TreasuryChest state={chestState(totals.incomeCents, totals.remainingCents)} />}
           overByWhenNegative
         />
       </div>

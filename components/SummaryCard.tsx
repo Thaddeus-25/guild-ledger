@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import PixelIcon from "./PixelIcon";
 import { formatCents } from "@/lib/money";
 import type { IconName } from "@/lib/types";
@@ -7,7 +8,7 @@ type SummaryCardProps = {
   title: string; // game name, e.g. "Gold spent"
   plain: string; // plain meaning, e.g. "Expenses"
   cents: number;
-  icon: IconName;
+  icon: IconName | ReactNode; // a pouch icon name, or your own art (like the treasure chest)
   overByWhenNegative?: boolean; // show "Over by $X" instead of a minus sign
 };
 
@@ -16,7 +17,7 @@ export default function SummaryCard({ title, plain, cents, icon, overByWhenNegat
 
   return (
     <div className={styles.card}>
-      <PixelIcon name={icon} size={40} />
+      {typeof icon === "string" ? <PixelIcon name={icon as IconName} size={40} /> : icon}
       <div>
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.plain}>{plain}</p>
