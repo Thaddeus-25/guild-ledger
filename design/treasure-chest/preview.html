@@ -1,0 +1,335 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Treasury Chest Icons</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: an inventory-ledger page. Parchment by day, dungeon stone by night; sprites always sit in "slots". */
+:root {
+  --bg: #f3ead6;
+  --panel: #fbf5e7;
+  --ink: #2b1d14;
+  --muted: #6e5a46;
+  --rule: #d8c7a6;
+  --accent: #b8801f;
+  --slot-light: #fff8e7;
+  --slot-dark: #1d1922;
+  --good: #3f7d3a; --warn: #b8801f; --bad: #c0392b;
+  --display: "Pixelify Sans", "Courier New", monospace;
+  --body: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17141c; --panel: #211c28; --ink: #f1e6cf; --muted: #b3a48c; --rule: #3a3242; --accent: #e8b33a;
+  --good: #7fc276; --warn: #e8b33a; --bad: #ff7a6b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #17141c; --panel: #211c28; --ink: #f1e6cf; --muted: #b3a48c; --rule: #3a3242; --accent: #e8b33a;
+  --good: #7fc276; --warn: #e8b33a; --bad: #ff7a6b; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font-family: var(--display); font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+section { display: grid; gap: 20px; }
+.lede { font-size: 1.1rem; color: var(--muted); }
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; }
+.hero-demo { background: var(--panel); border: 3px solid var(--ink); padding: 20px; display: grid; gap: 14px; justify-items: center; box-shadow: 6px 6px 0 var(--rule); min-width: 260px; }
+.hero-demo .big { width: 192px; height: 192px; }
+.readout { font-family: var(--display); font-size: 1.3rem; display: flex; gap: 10px; align-items: baseline; }
+.readout small { font-size: .9rem; color: var(--muted); }
+.stat-name { font-family: var(--display); font-size: 1rem; padding: 2px 10px; border: 2px solid currentColor; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.range-labels { display: flex; justify-content: space-between; width: 100%; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) { .hero { grid-template-columns: 1fr; } .hero-demo { min-width: 0; } }
+
+/* states */
+.states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 820px) { .states { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .states { grid-template-columns: 1fr; } }
+.state { border-top: 3px solid var(--ink); padding-top: 14px; display: grid; gap: 10px; align-content: start; }
+.state.over { border-top-color: var(--bad); }
+.state-head { display: flex; gap: 14px; align-items: center; }
+.state-head canvas { width: 96px; height: 96px; flex: none; }
+.range { font-family: var(--display); font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.state p { font-size: .95rem; }
+.cue { font-size: .82rem; color: var(--muted); }
+
+/* palette */
+.palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px 16px; }
+.sw { display: flex; gap: 10px; align-items: center; font-size: .85rem; }
+.sw i { width: 28px; height: 28px; border: 2px solid var(--ink); flex: none; }
+.sw b { font-family: var(--display); font-weight: 500; display: block; }
+.sw code { color: var(--muted); font-size: .78rem; }
+.pal-group { display: grid; gap: 10px; }
+
+/* size test */
+.sizes { overflow-x: auto; }
+.size-table { border-collapse: collapse; min-width: 640px; width: 100%; }
+.size-table th { font-family: var(--display); font-weight: 500; font-size: .85rem; text-align: left; padding: 8px 10px; color: var(--muted); }
+.size-table td { padding: 10px; vertical-align: middle; }
+.bgcell { display: flex; gap: 10px; align-items: center; padding: 12px; flex-wrap: nowrap; }
+.bgcell.light { background: var(--slot-light); }
+.bgcell.dark { background: var(--slot-dark); }
+.bgcell.mid { background: #7a8a6a; }
+.size-table tr + tr td { border-top: 1px solid var(--rule); }
+.note { font-size: .85rem; color: var(--muted); }
+
+/* mimic */
+.mimic { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: start; background: var(--panel); border: 3px solid var(--bad); padding: 24px; }
+.mimic canvas { width: 160px; height: 160px; }
+.mimic ul, .rules ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 66ch; }
+@media (max-width: 600px) { .mimic { grid-template-columns: 1fr; justify-items: start; } }
+.alt { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.alt div { border-left: 3px solid var(--rule); padding-left: 12px; font-size: .92rem; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.rules > div { display: grid; gap: 8px; align-content: start; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .88em; }
+.sheet { display: flex; flex-wrap: wrap; gap: 6px; }
+.sheet canvas { width: 64px; height: 64px; }
+.toggle { font: inherit; font-family: var(--display); background: var(--panel); color: var(--ink); border: 2px solid var(--ink); padding: 4px 12px; cursor: pointer; }
+.toggle:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div style="display:grid;gap:14px;min-width:0">
+      <span class="eyebrow">Guild Ledger · icon system</span>
+      <h1>The Treasury Chest</h1>
+      <p class="lede">One chest, six states. The amount of gold left this month is the amount of gold in the chest. Only the contents and the lock gem change; the wood, bands, angle and outline never move, so the eye reads the difference instantly.</p>
+      <p class="note">Gold left = Monthly income − Monthly spending, shown as a share of this month's income. Drag the slider to spend some gold.</p>
+    </div>
+    <div class="hero-demo">
+      <canvas id="demo" class="big" width="32" height="32" aria-label="Treasure chest preview"></canvas>
+      <div class="readout"><span id="demoPct">92%</span><small>of the month's gold left</small></div>
+      <span class="stat-name" id="demoName">Wealthy</span>
+      <label for="pct" class="note" style="justify-self:start">Gold left</label>
+      <input id="pct" type="range" min="-30" max="100" value="92">
+      <div class="range-labels"><span>−30%</span><span>0%</span><span>100%</span></div>
+    </div>
+  </header>
+
+  <section>
+    <span class="eyebrow">The six states</span>
+    <h2>Same chest, changing contents</h2>
+    <div class="states" id="states"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Visual direction</span>
+    <h2>Palette</h2>
+    <p>The palette extends the colors already in <code>lib/icons.ts</code>, so the chest sits naturally beside the 16×16 pouch icons. The app's own letters are kept; new shades are only added where 32×32 needs more steps of light. Gold is kept yellow and the bronze is kept orange-brown so the metal bands never read as treasure.</p>
+    <div class="palette" id="palette"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Size test</span>
+    <h2>32, 48 and 64 px on light, mid and dark</h2>
+    <p>Pixel art only stays crisp at whole-number scales. The family ships in two grids: a <b>32×32 master</b> for 32 px (1×) and 64 px (2×), and a <b>16×16 glyph</b> for 48 px (3×), 16 px, and anywhere it sits next to pouch icons. A 32-px sprite stretched to 48 px would be scaled 1.5×, which smears every other pixel.</p>
+    <div class="sizes">
+      <table class="size-table" id="sizeTable"></table>
+    </div>
+    <p class="note">The dark outline separates the chest from light backgrounds; the bright gold, bronze and lit rim carry the silhouette on dark ones. Nothing in the artwork relies on the background color, and the background is fully transparent.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Below 0%</span>
+    <h2>Recommended: the Mimic</h2>
+    <div class="mimic">
+      <div style="display:grid;gap:10px;justify-items:center">
+        <canvas id="mimicBig" width="32" height="32" aria-label="Mimic chest"></canvas>
+        <button class="toggle" id="chomp" type="button">Pause animation</button>
+      </div>
+      <div style="display:grid;gap:14px;min-width:0">
+        <p>When spending passes income, the chest turns out to be a mimic. It is the strongest option because it keeps the exact silhouette of the chest (same lid, bands, lock and outline), so the user still recognizes "my treasury", but the meaning flips from reward to danger.</p>
+        <ul>
+          <li><b>Fangs</b> replace the gold: upper teeth hang from the lid edge, lower teeth rise from the rim. The mouth is empty.</li>
+          <li><b>Glowing eyes</b> in the dark interior, with the inner corners dropped so they read as angry even at 32 px.</li>
+          <li><b>A red tongue</b> lolls over the front: the only large red shape in the whole family, so it pops at a glance.</li>
+          <li><b>The lock gem turns red.</b> Purple means magic is intact; grey means it's fading; red means it's hostile.</li>
+          <li><b>A 2-frame idle</b> (blink every few seconds) makes it feel like a game event, not an error banner. Show it still if the user prefers reduced motion.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alt">
+      <div><b>Broken chest</b><br>Clear, but reads as "damaged property", and a smashed lid changes the silhouette more than needed.</div>
+      <div><b>Monster guarding an empty chest</b><br>Fun, but two subjects in 32 px is too much detail; it falls apart at small sizes.</div>
+      <div><b>Cracked chest with scattered coins</b><br>Scattered coins say "you still have some", which is the opposite of the message.</div>
+    </div>
+  </section>
+
+  <section class="rules">
+    <div>
+      <span class="eyebrow">What stays fixed</span>
+      <h3>The chest</h3>
+      <ul>
+        <li>Front 3/4 view, lid open at the same angle in every state.</li>
+        <li>One-pixel <code>#2b1d14</code> outline, light from the top left.</li>
+        <li>Two bronze bands, bronze trim top and bottom, center lock plate.</li>
+        <li>The front wall is drawn last, so coins always sit <i>inside</i> the chest.</li>
+      </ul>
+    </div>
+    <div>
+      <span class="eyebrow">What changes</span>
+      <h3>Three cues, read together</h3>
+      <ul>
+        <li><b>Gold height</b>: the main signal. Each state has a clearly different fill line.</li>
+        <li><b>Gem</b>: bright (wealthy), purple (normal), grey (critical), red (mimic). A second cue that doesn't depend on seeing the gold.</li>
+        <li><b>Extras</b>: sparkles and spilled coins at the top; a cobweb at the bottom.</li>
+      </ul>
+    </div>
+    <div>
+      <span class="eyebrow">In the app</span>
+      <h3>Using it</h3>
+      <ul>
+        <li>Pick the state from the share left: ≥80, ≥60, ≥40, ≥20, ≥0, else overspent.</li>
+        <li>CSS: <code>image-rendering: pixelated</code> and sizes in whole multiples.</li>
+        <li>Pair the icon with the amount in text; the art is never the only carrier of the number.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Sprite sheet</span>
+    <h2>Every sprite at 2×</h2>
+    <div class="sheet" id="sheet"></div>
+  </section>
+</div>
+
+<script>
+const DATA = {"COLORS":{"k":"#2b1d14","i":"#1c120c","d":"#4a2c1a","B":"#6b4226","b":"#9c6b3c","h":"#c99760","m":"#7a4a22","n":"#b87333","N":"#e8a860","o":"#b8801f","y":"#e8b33a","Y":"#f8d878","w":"#fff8e7","p":"#7d4fb0","P":"#b88ce0","s":"#8a939c","S":"#d0d7de","r":"#c0392b","R":"#e8705f","c":"#f4e4c1","C":"#d9bf8c"},"STATES":[{"id":"wealthy","name":"Wealthy","range":"80–100%"},{"id":"comfortable","name":"Comfortable","range":"60–79%"},{"id":"cautious","name":"Cautious","range":"40–59%"},{"id":"low","name":"Low","range":"20–39%"},{"id":"critical","name":"Critical","range":"0–19%"},{"id":"overspent","name":"Overspent","range":"below 0%"}],"art":{"16":{"wealthy":["................","......y.Yy......","...kkkYYyokYk...","..kyYYyoyyYonk..","..koYyyoYyyoyk..",".kkyyoyyyoyyykk.",".kiyyoYyyoYyyik.",".kioyyyoyyyoyik.",".khhyhhhhhYhhhk.",".kbnbbbkkbobnbk.",".kbnbbkpwkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"],"comfortable":["................","................","...kkkkkkkkkk...","..knddddddddnk..","..knBByBYyBBnk..",".kkykYyYyoYYkkk.",".kiyYoYyyoYyyik.",".kioyyyoyyyoyik.",".khhhhhhhhhhhhk.",".kbnbbbkkbbbnbk.",".kbnbbkpPkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"],"cautious":["................","................","...kkkkkkkkkk...","..knddddddddnk..","..knBBBBBBBBnk..",".kkkkkkkkkkkkkk.",".kikkkykYykYkik.",".kkyYYyYyyYokik.",".khhhhhhhhhhhhk.",".kbnbbbkkbbbnbk.",".kbnbbkpPkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"],"low":["................","................","...kkkkkkkkkk...","..knddddddddnk..","..knBBBBBBBBnk..",".kkkkkkkkkkkkkk.",".kiiiikikkiiiik.",".kiiikykYykiiik.",".khhhhhhhhhhhhk.",".kbnbbbkkbbbnbk.",".kbnbbkpPkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"],"critical":["................","................","...kkkkkkkkkk...","..knddddddddnk..","..knBBBBBBBBnk..",".kkkkkkkkkkkkkk.",".kSsiiiiiiiiiik.",".ksiiiiYoiiiiik.",".khhhhhhhhhhhhk.",".kbnbbbkkbbbnbk.",".kbnbbksSkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"],"overspent":["................","................","...kkkkkkkkkk...","..knddddddddnk..","..knBBBBBBBBnk..",".kkkkkkkkkkkkkk.",".kciYYiciiYYick.",".kiRiiiiciiicik.",".khRhhhhhhhhhhk.",".kbrbbbkkbbbnbk.",".kbnbbkrRkbbnbk.",".kbnbbbkkbbbnbk.",".kBnBBBBBBBBnBk.",".kkkkkkkkkkkkkk.","................","................"]},"32":{"wealthy":["..................w.............",".....w..kkkkkkkkkwYwkkkk........","....wYwknnnnnnkkknwnnnnnkk......","....kwnBBBBkBkYyYkykBBBBBnkk....","...knBddddkYkYyoYYyYkdddddwnk...","...knBdmkkkyyoyyyoyyYkkmmwYwk...","...knBdkYyYyyoYyyoYyyyYkkdwnk...","...knBBkyyyoyyyoyyyoyyyYykBnk...","...knBkYYyyoYyyoYyyoYyyoYkBnk...","...knkyyyoyyyoyyyoyyyoyyyYknk...","...knkYyyoYyyoYyyoYyyoYyyokkk...","...kkYyoyyyoyyyoyyyoyyyoyyYyk...","...kYyyoYyyoYyyoYyyoYyyoYyyok...","...kyoyyyoyyyoyyyoyyyoyyyoyyk...","...kyoYyyoYyyoYyyoYyyoYyyoYyk...","...kyyyoyyyoyyyoyyyoyyyoyyyok...","...kYykkkyyoYyyoYyyoYyyoYyyok...","...kykYyykyyyoyyyoyyyoykkkyyk...","...kNkyookhhhhhhhhhhhhkYyykNk...","...kkkkkknnnnkNNNNknnnkyooknk...","...kYyyknbbbbknwpnkbbbbkkknNk...","...kyooknbbbbknppnkbbbbNnbbBk...","...kkkkNnBBBBkmnnmkBBBBNnBBBk...","...khbbNnbbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...",".kkkhbbNnbbbbbbbbbbbbbbNnbbBk...","kYyykBBNnBBBBBBBBBBBBBBNnBBkkk..","kyookkknnnnnnnnnnnnnnnnnnnkYyyk.",".kkkYyykmmmmmmmmmmmmmmmmmmkyook.","...kyookkkkkkkkkkkkkkkkkkkkkkk..","....kkk........................."],"comfortable":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmwdBnk...","...knBBmmBBBBBkkkBkkBBBwYwBnk...","...knBdmmddkkkYyYkyYkddmwdBnk...","...knBBmkkkYyYyyyYyykkkmmBBnk...","...knBkkYyYyyoYyyoYyYyYkkkBnk...","...knkykyyyoyyyoyyyoyyyYyYknk...","...khkyYYyyoYyyoYyyoYyyoYykkk...","...kkYyyyoyyyoyyyoyyyoyyyoYyk...","...kYoYyyoYyyoYyyoYyyoYyyoYyk...","...kyyyoyyyoyyyoyyyoyyyoyyyok...","...kYyyoYyyoYyyoYyyoYyyoYyyok...","...kyoyyyoyyyoyyyoyyyoyyyoyyk...","...kNhhhhhhhhhhhhhhhhhhhhhhNk...","...knnnnnnnnnkNNNNknnnnnnnnnk...","...kNnbNnbbbbknPpnkbbbbNnbnNk...","...khbbNnbbbbknppnkbbbbNnbbBk...","...kbBBNnBBBBkmnnmkBBBBNnBBBk...","...khbbNnbbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"],"cautious":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knnnnnnnnnnnnnnnnnnnnnnnnk...","...khhhhhhhkhhkkkhkkhhhhhhhhk...","...kdBkBkkkYkkYyYkyYkkkBkkBdk...","...kdkykYyYyyYYyyYYyYyYkyYkkk...","...kkkyYyyyoyyyoyyyoyyyYyykyk...","...kYYyoYyyoYyyoYyyoYyyoYyYok...","...kyoyyyoyyyoyyyoyyyoyyyoyyk...","...kNhhhhhhhhhhhhhhhhhhhhhhNk...","...knnnnnnnnnkNNNNknnnnnnnnnk...","...kNnbNnbbbbknPpnkbbbbNnbnNk...","...khbbNnbbbbknppnkbbbbNnbbBk...","...kbBBNnBBBBkmnnmkBBBBNnBBBk...","...khbbNnbbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"],"low":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knnnnnnnnnnnnnnnnnnnnnnnnk...","...khhhhhhhhhhhhhhhhhhhhhhhhk...","...kdBBBBBBBBBBBBBBBBBBBBBBdk...","...kdiiiiiiiiikkkikiiiiiiiidk...","...kdiiiiiiiikYyYkykiiiiiiidk...","...kdiiiiiikkYyoYYyYkiiiiiidk...","...kdiiiiikYyoyyyoyykiiiiiidk...","...kNhhhhhhhhhhhhhhhhhhhhhhNk...","...knnnnnnnnnkNNNNknnnnnnnnnk...","...kNnbNnbbbbknPpnkbbbbNnbnNk...","...khbbNnbbbbknppnkbbbbNnbbBk...","...kbBBNnBBBBkmnnmkBBBBNnBBBk...","...khbbNnbbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"],"critical":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knnnnnnnnnnnnnnnnnnnnnnnnk...","...khhhhhhhhhhhhhhhhhhhhhhhhk...","...kdSsSBBBBBBBBBBBBBBBBSBBdk...","...kdsSiiiiiikkkiiiiiiiiSsidk...","...kdSiiiiiikYyykikkkiiiSsSdk...","...kdiiiiiiikyookkYyykiiiiidk...","...kdiiiiiiiikkkikyookiiiiidk...","...kNhhhhhhhhhhhhhkkkhhhhhhNk...","...knnnnnnnnnkNNNNknnnnnnnnnk...","...kNnbNnbbbbknSsnkbbbbNnbnNk...","...khbbNnbbbbknssnkbbbbNnbbBk...","...kbBBNnBBBBkmnnmkBBBBNnBBBk...","...khbbNnbbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"],"overspent":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knnnnnnnnnnnnnnnnnnnnnnnnk...","...kicCiicCiicCiicCiicCiicCik...","...kiciiiciiiciiiciiiciiiciik...","...kdiiiiYYiiiiiiiiiiYYiiiidk...","...kdiiiiYrYiiiiiiiiYrYiiiidk...","...kdciiiiiiiiiiciiiciiiciidk...","...kdcCRRRRRiiiicCiicCiicCidk...","...kNhkRRrRRkhhhhhhhhhhhhhhNk...","...knnkRRrRRkkNNNNknnnnnnnnnk...","...kNnbkRrRkbknRrnkbbbbNnbnNk...","...khbbkRrRkbknrrnkbbbbNnbbBk...","...kbBBNkRkBBkmnnmkBBBBNnBBBk...","...khbbNnkbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"],"overspent-blink":["................................","........kkkkkkkkkkkkkkkk........","......kknnnnnnnnnnnnnnnnkk......","....kknBBBBBBBBBBBBBBBBBBnkk....","...knBddddddddddddddddddddBnk...","...knBdmmddddddddddddddmmdBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knBBmmBBBBBBBBBBBBBBmmBBnk...","...knBdmmddddddddddddddmmdBnk...","...knnnnnnnnnnnnnnnnnnnnnnnnk...","...kicCiicCiicCiicCiicCiicCik...","...kiciiiciiiciiiciiiciiiciik...","...kdiiiiiiiiiiiiiiiiiiiiiidk...","...kdiiiiYYYiiiiiiiiYYYiiiidk...","...kdciiiiiiiiiiciiiciiiciidk...","...kdcCRRRRRiiiicCiicCiicCidk...","...kNhkRRrRRkhhhhhhhhhhhhhhNk...","...knnkRRrRRkkNNNNknnnnnnnnnk...","...kNnbkRrRkbknRrnkbbbbNnbnNk...","...khbbkRrRkbknrrnkbbbbNnbbBk...","...kbBBNkRkBBkmnnmkBBBBNnBBBk...","...khbbNnkbbbkmkkmkbbbbNnbbBk...","...khbbNnbbbbbkkkkbbbbbNnbbBk...","...kbBBNnBBBBBBBBBBBBBBNnBBBk...","...khbbNnbbbbbbbbbbbbbbNnbbBk...","...kBBBNnBBBBBBBBBBBBBBNnBBBk...","...kNnnnnnnnnnnnnnnnnnnnnnnNk...","...kmmmmmmmmmmmmmmmmmmmmmmmmk...","....kkkkkkkkkkkkkkkkkkkkkkkk....","................................"]}}};
+const { COLORS, STATES, art } = DATA;
+
+function draw(canvas, rows) {
+  const n = rows.length;
+  canvas.width = n; canvas.height = n;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, n, n);
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch === ".") return;
+    ctx.fillStyle = COLORS[ch]; ctx.fillRect(x, y, 1, 1);
+  }));
+}
+function sprite(rows, px, label) {
+  const c = document.createElement("canvas");
+  draw(c, rows);
+  c.style.width = c.style.height = px + "px";
+  c.setAttribute("role", "img"); c.setAttribute("aria-label", label);
+  return c;
+}
+
+const COPY = {
+  wealthy: ["Gold heaped above the rim and over the open lid. Coins slide down the front and land beside the chest; sparkles float above.", "Gem: bright with a white glint. Extras: spill, ground coins, 3 sparkles."],
+  comfortable: ["A full chest with a gentle mound peeking over the rim. Still clearly rewarding, just not overflowing.", "Gem: purple. Extras: one sparkle. Front is clean, no spill."],
+  cautious: ["The gold sits level with the rim. The back wall of the chest shows for the first time, a quiet hint to slow down.", "Gem: purple. No extras. First state where dark interior shows."],
+  low: ["A single small heap in the middle. Most of the chest is a dark, empty hollow.", "Gem: purple. The empty interior is now the largest shape."],
+  critical: ["Two lonely coins on the floor and cobwebs in the corners. Nobody has touched this chest in a while.", "Gem: grey, the magic is fading. Extras: cobwebs."],
+  overspent: ["The chest was a mimic all along. Fangs, glowing eyes, a lolling tongue, and not one coin.", "Gem: red. The silhouette stays the same, so it's still \"your\" chest."],
+};
+
+// states
+const statesEl = document.getElementById("states");
+for (const s of STATES) {
+  const card = document.createElement("article");
+  card.className = "state" + (s.id === "overspent" ? " over" : "");
+  const head = document.createElement("div"); head.className = "state-head";
+  head.append(sprite(art[32][s.id], 96, s.name + " chest"));
+  const t = document.createElement("div");
+  t.innerHTML = `<h3>${s.name}</h3><div class="range">${s.range} left</div>`;
+  head.append(t);
+  const p = document.createElement("p"); p.textContent = COPY[s.id][0];
+  const cue = document.createElement("p"); cue.className = "cue"; cue.textContent = COPY[s.id][1];
+  card.append(head, p, cue);
+  statesEl.append(card);
+}
+
+// palette
+const GROUPS = [
+  ["Outline & wood", [["k","Outline"],["i","Interior"],["d","Deep wood"],["B","Dark wood"],["b","Wood"],["h","Wood light"]]],
+  ["Bronze", [["m","Bronze shadow"],["n","Bronze"],["N","Bronze light"]]],
+  ["Gold", [["o","Dark gold"],["y","Gold"],["Y","Light gold"],["w","Glint"]]],
+  ["Magic & mimic", [["p","Gem"],["P","Gem light"],["s","Dull gem"],["S","Cobweb"],["r","Mimic red"],["R","Tongue"],["c","Fang"],["C","Fang shade"]]],
+];
+const pal = document.getElementById("palette");
+for (const [name, list] of GROUPS) for (const [k, label] of list) {
+  const d = document.createElement("div"); d.className = "sw";
+  d.innerHTML = `<i style="background:${COLORS[k]}"></i><span><b>${label}</b><code>${k} · ${COLORS[k]}</code></span>`;
+  pal.append(d);
+}
+
+// size table
+const table = document.getElementById("sizeTable");
+const rowsSpec = [
+  ["32 px", "32×32 at 1×", 32, 32],
+  ["48 px", "16×16 at 3×", 16, 48],
+  ["64 px", "32×32 at 2×", 32, 64],
+];
+table.innerHTML = `<thead><tr><th>Slot</th><th>Light</th><th>Mid</th><th>Dark</th></tr></thead>`;
+const tb = document.createElement("tbody");
+for (const [slot, how, grid, px] of rowsSpec) {
+  const tr = document.createElement("tr");
+  const th = document.createElement("td");
+  th.innerHTML = `<b style="font-family:var(--display)">${slot}</b><div class="note">${how}</div>`;
+  tr.append(th);
+  for (const bg of ["light", "mid", "dark"]) {
+    const td = document.createElement("td");
+    const cell = document.createElement("div"); cell.className = "bgcell " + bg;
+    for (const s of STATES) cell.append(sprite(art[grid][s.id], px, `${s.name}, ${slot}`));
+    td.append(cell); tr.append(td);
+  }
+  tb.append(tr);
+}
+table.append(tb);
+
+// sheet
+const sheet = document.getElementById("sheet");
+for (const s of STATES) sheet.append(sprite(art[32][s.id], 64, s.name));
+sheet.append(sprite(art[32]["overspent-blink"], 64, "Mimic, blink frame"));
+for (const s of STATES) sheet.append(sprite(art[16][s.id], 32, s.name + " glyph"));
+
+// demo
+function stateFor(pct) {
+  if (pct < 0) return "overspent";
+  if (pct >= 80) return "wealthy";
+  if (pct >= 60) return "comfortable";
+  if (pct >= 40) return "cautious";
+  if (pct >= 20) return "low";
+  return "critical";
+}
+const demo = document.getElementById("demo"), pct = document.getElementById("pct");
+const nameEl = document.getElementById("demoName"), pctEl = document.getElementById("demoPct");
+let blink = false;
+function renderDemo() {
+  const v = +pct.value, id = stateFor(v);
+  const key = id === "overspent" && blink ? "overspent-blink" : id;
+  draw(demo, art[32][key]);
+  pctEl.textContent = v + "%";
+  nameEl.textContent = STATES.find((s) => s.id === id).name;
+  nameEl.style.color = id === "overspent" || id === "critical" ? "var(--bad)" : id === "low" || id === "cautious" ? "var(--warn)" : "var(--good)";
+}
+pct.addEventListener("input", renderDemo);
+renderDemo();
+
+// mimic blink
+const mimicBig = document.getElementById("mimicBig");
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let playing = !reduced, tick = 0;
+const btn = document.getElementById("chomp");
+btn.textContent = playing ? "Pause animation" : "Play animation";
+btn.addEventListener("click", () => { playing = !playing; btn.textContent = playing ? "Pause animation" : "Play animation"; });
+function frame() {
+  if (playing) { tick = (tick + 1) % 12; blink = tick === 0 || tick === 6 ? false : tick === 11; }
+  else blink = false;
+  draw(mimicBig, art[32][blink ? "overspent-blink" : "overspent"]);
+  if (stateFor(+pct.value) === "overspent") renderDemo();
+}
+frame();
+setInterval(frame, 300);
+</script>
