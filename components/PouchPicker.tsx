@@ -24,10 +24,12 @@ type PouchPickerProps = {
   value: string; // the chosen pouch's id, or "" for none
   onChange: (id: string) => void;
   errorId?: string;
+  label?: string; // the field's visible name; "Coin Pouch" unless given
 };
 
 export default function PouchPicker(props: PouchPickerProps) {
   const { id, type, pouches, transactions, month, value, onChange, errorId } = props;
+  const label = props.label ?? "Coin Pouch";
   const [open, setOpen] = useState(false);
   const chosen = pouches.find((p) => p.id === value);
   const chosenLeft = chosen ? pouchLeftText(chosen, transactions, month) : null;
@@ -40,7 +42,7 @@ export default function PouchPicker(props: PouchPickerProps) {
   return (
     <>
       <span className="field-label" id={`${id}-label`}>
-        Coin Pouch
+        {label}
       </span>
       <button
         type="button"

@@ -11,6 +11,7 @@ import { useState, useSyncExternalStore } from "react";
 import BottomSheet from "./BottomSheet";
 import PixelIcon from "./PixelIcon";
 import { addDollars, finishAmount, pressKeyFresh, type PadKey } from "@/lib/amountPad";
+import { formatCents } from "@/lib/money";
 import styles from "./AmountInput.module.css";
 
 type AmountInputProps = {
@@ -20,6 +21,8 @@ type AmountInputProps = {
   sheetTitle: string;
   placeholder?: string;
   className?: string;
+  maxCents?: number; // a lower limit than $1,000,000, e.g. what's left to split
+  maxLabel?: string; // shown in the pad when there's a limit, e.g. "left to split"
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
 };
@@ -42,7 +45,7 @@ function subscribeToPointer(onChange: () => void) {
 }
 
 export default function AmountInput(props: AmountInputProps) {
-  const { id, value, onChange, sheetTitle, placeholder, className } = props;
+  const { id, value, onChange, sheetTitle, placeholder, className, maxCents, maxLabel } = props;
   const [open, setOpen] = useState(false);
   const isTouch = useSyncExternalStore(
     subscribeToPointer,
@@ -51,9 +54,9 @@ export default function AmountInput(props: AmountInputProps) {
   );
 
   // However the pad closes (Done, ✕, Esc, a tap outside), tidy the amount:
-  // "12." can't be saved, so it becomes "12".
+  // "5" becomes "5.00" and "12." becomes "12.00".
   function close() {
-    onChange(finishAmount(value));
+    onChange(finishAmount(value, maxCents));
     setOpen(false);
   }
 
@@ -69,13 +72,15 @@ export default function AmountInput(props: AmountInputProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onClick={() => setOpen(true)} // a tap or click opens the pad; Tab-ing in doesn't
+        // Typed on a computer without the pad: tidy it the same way.
+        onBlur={() => onChange(finishAmount(value, maxCents))}
         aria-invalid={props["aria-invalid"]}
         aria-describedby={props["aria-describedby"]}
         aria-haspopup="dialog"
       />
 
       <BottomSheet open={open} title={sheetTitle} onClose={close}>
-        <Pad value={value} onChange={onChange} onDone={close} />
+        <Pad value={value} onChange={onChange} onDone={close} maxCents={maxCents} maxLabel={maxLabel} />
       </BottomSheet>
     </>
   );
@@ -85,20 +90,22 @@ type PadProps = {
   value: string;
   onChange: (value: string) => void;
   onDone: () => void;
+  maxCents?: number;
+  maxLabel?: string;
 };
 
 // The pad itself. It's built fresh each time the sheet opens, so "fresh"
 // starts true: the first digit replaces an amount that was already there.
-function Pad({ value, onChange, onDone }: PadProps) {
+function Pad({ value, onChange, onDone, maxCents, maxLabel }: PadProps) {
   const [fresh, setFresh] = useState(value !== "");
 
   function press(key: PadKey) {
-    onChange(pressKeyFresh(value, key, fresh));
+    onChange(pressKeyFresh(value, key, fresh, maxCents));
     setFresh(false);
   }
 
   function addCoin(dollars: number) {
-    onChange(addDollars(value, dollars));
+    onChange(addDollars(value, dollars, maxCents));
     setFresh(false);
   }
 
@@ -118,6 +125,11 @@ function Pad({ value, onChange, onDone }: PadProps) {
       <p className={styles.total} aria-live="polite">
         ${value || "0"}
       </p>
+      {maxCents !== undefined && (
+        <p className={styles.limit}>
+          Up to {formatCents(maxCents)} {maxLabel ?? ""}
+        </p>
+      )}
 
       <div className={styles.coins}>
         {COINS.map((dollars) => (

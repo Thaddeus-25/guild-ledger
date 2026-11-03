@@ -1,0 +1,120 @@
+/* Money always uses the readable body font: the pixel font's 5 looks like S. */
+.money {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- On the form ---------- */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 4px 10px;
+  background: #fffaf0;
+  border: 3px solid var(--parchment-dark);
+}
+
+.noIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.summaryName {
+  font-family: var(--font-pixel), monospace;
+  font-weight: 600;
+}
+
+.rest {
+  font-size: 0.9rem;
+  color: var(--wood);
+}
+
+.openButton {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* ---------- In the sheet ---------- */
+
+.total {
+  margin-bottom: 12px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  padding: 8px 12px 12px;
+  background: var(--parchment-dark);
+  border: 3px solid var(--wood-dark);
+}
+
+.itemHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.itemTitle {
+  font-family: var(--font-pixel), monospace;
+  font-weight: 600;
+}
+
+.remove {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fffaf0;
+  border: 3px solid var(--wood-dark);
+  cursor: pointer;
+}
+
+.amount {
+  max-width: 220px;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lastField {
+  margin-bottom: 0;
+}
+
+.add {
+  margin-bottom: 16px;
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.done {
+  width: calc(100% - 8px); /* room for the pixel border drawn outside it */
+}

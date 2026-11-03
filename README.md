@@ -88,6 +88,7 @@ components/     reusable pieces: NavBar, PixelPanel, PixelIcon, BudgetBar, forms
   PouchPicker.tsx   the Coin Pouch list with icons and what's left
   AmountInput.tsx   the number pad with coin buttons
   PixelCheckbox.tsx the gold pixel checkbox
+  SplitItems.tsx    splitting a new entry's amount across several pouches
 lib/            logic with no screen code, each file with its own .test.ts
   types.ts        the shape of the saved data
   money.ts        cents <-> "$12.50" (money is always stored as whole cents)
@@ -96,6 +97,7 @@ lib/            logic with no screen code, each file with its own .test.ts
   calendar.ts     the date picker's calendar maths (weeks start on Sunday)
   amountPad.ts    the number pad's rules (2 decimals, $1,000,000 cap)
   validation.ts   checks for the entry and pouch forms
+  split.ts        splitting one payment into several entries (the rest stays in the main pouch)
   storage.ts      checking saved data; reading the old browser ledger
   remoteStore.ts  loading and saving in Supabase (with version checks)
   saveQueue.ts    one save at a time, always the newest data

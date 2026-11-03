@@ -1,7 +1,7 @@
 "use client";
 
 // A panel that slides up from the bottom of the screen, used by the date,
-// Coin Pouch and amount pickers.
+// Coin Pouch and amount pickers and the split sheet.
 //
 // It's built on the browser's <dialog> element. We draw every pixel of it
 // ourselves, but the browser still does the invisible, important work:
@@ -56,8 +56,12 @@ export default function BottomSheet({ open, title, onClose, children }: BottomSh
       ref={dialogRef}
       className={styles.sheet}
       aria-labelledby={titleId}
-      // Esc, the back gesture or dialog.close() all end up here.
-      onClose={onClose}
+      // Esc, the back gesture or dialog.close() all end up here. A sheet can
+      // open another on top (the split sheet opens the amount pad), and React
+      // passes the inner sheet's close up to this one, so only react to our own.
+      onClose={(event) => {
+        if (event.target === dialogRef.current) onClose();
+      }}
       // A tap on the dimmed area lands on the dialog itself, not the panel.
       onClick={(event) => {
         if (event.target === dialogRef.current) onClose();

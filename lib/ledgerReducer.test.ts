@@ -46,6 +46,19 @@ describe("ledgerReducer", () => {
     expect(state.logbookDays).toEqual(["2026-10-29"]);
   });
 
+  it("adds several entries at once (a split payment) with one logbook stamp", () => {
+    const state = ledgerReducer(withEntry(), {
+      type: "addTransactions",
+      transactions: [
+        { ...entry, id: "t2" },
+        { ...entry, id: "t3", categoryId: "tavern" },
+      ],
+      today: "2026-10-30",
+    });
+    expect(state.transactions.map((t) => t.id)).toEqual(["t1", "t2", "t3"]);
+    expect(state.logbookDays).toEqual(["2026-10-29", "2026-10-30"]);
+  });
+
   it("keeps logbook stamps when an entry is deleted", () => {
     const state = ledgerReducer(withEntry(), { type: "deleteTransaction", id: "t1" });
     expect(state.transactions).toEqual([]);

@@ -6,10 +6,12 @@ import { useId, useRef, useState } from "react";
 import AmountInput from "./AmountInput";
 import DatePicker from "./DatePicker";
 import PouchPicker from "./PouchPicker";
+import SplitItems from "./SplitItems";
 import { monthOf, todayISO } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import { useLedger } from "@/lib/LedgerContext";
 import { centsToInput } from "@/lib/money";
+import { validateSplitEntry, type SplitItem, type SplitItemErrors } from "@/lib/split";
 import type { EntryType, Transaction } from "@/lib/types";
 import { validateTransactionInput, type TransactionErrors } from "@/lib/validation";
 import styles from "./TransactionForm.module.css";
@@ -31,6 +33,12 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [note, setNote] = useState(initial?.note ?? "");
   const [errors, setErrors] = useState<TransactionErrors>({});
+  // The optional split (new entries only): parts of the amount that go to
+  // other pouches. Its errors are kept by item id, so removing an item
+  // doesn't move an error onto its neighbour.
+  const [splitItems, setSplitItems] = useState<SplitItem[]>([]);
+  const [itemErrors, setItemErrors] = useState<Record<string, SplitItemErrors>>({});
+  const [splitError, setSplitError] = useState<string | undefined>();
   // Set on the first successful save. The page takes a moment to switch,
   // and a double-click in that moment must not record the entry twice.
   // A ref (not state) because it must change instantly, between clicks.
@@ -43,28 +51,47 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
     // A pouch picked for the other type no longer fits, so clear it.
     const chosen = data.categories.find((c) => c.id === categoryId);
     if (chosen && chosen.type !== newType) setCategoryId("");
+    // The same goes for each split item's pouch.
+    setSplitItems((items) =>
+      items.map((item) => {
+        const pouch = data.categories.find((c) => c.id === item.categoryId);
+        return pouch && pouch.type !== newType ? { ...item, categoryId: "" } : item;
+      }),
+    );
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saved.current) return;
 
-    const result = validateTransactionInput({ type, amount, date, categoryId, note }, data.categories);
-    if (!result.ok) {
-      setErrors(result.errors);
+    const input = { type, amount, date, categoryId, note };
+
+    if (initial) {
+      const result = validateTransactionInput(input, data.categories);
+      if (!result.ok) {
+        setErrors(result.errors);
+        return;
+      }
+      saved.current = true;
+      dispatch({ type: "updateTransaction", transaction: { id: initial.id, ...result.value } });
+      router.push(returnTo);
       return;
     }
 
-    saved.current = true;
-    if (initial) {
-      dispatch({ type: "updateTransaction", transaction: { id: initial.id, ...result.value } });
-    } else {
-      dispatch({
-        type: "addTransaction",
-        transaction: { id: newId(), ...result.value },
-        today: todayISO(),
-      });
+    // A new entry may be split into several; with no items it's just one.
+    const result = validateSplitEntry(input, splitItems, data.categories);
+    if (!result.ok) {
+      setErrors(result.errors);
+      setItemErrors(Object.fromEntries(splitItems.map((item, i) => [item.id, result.itemErrors[i]])));
+      setSplitError(result.splitError);
+      return;
     }
+    saved.current = true;
+    dispatch({
+      type: "addTransactions",
+      transactions: result.entries.map((entry) => ({ id: newId(), ...entry })),
+      today: todayISO(),
+    });
     router.push(returnTo);
   }
 
@@ -139,9 +166,26 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
           value={categoryId}
           onChange={setCategoryId}
           errorId={errors.categoryId ? `${formId}-categoryId-error` : undefined}
+          label={splitItems.length > 0 ? "Coin Pouch for the rest" : undefined}
         />
         {errorMessage("categoryId")}
       </div>
+
+      {!initial && (
+        <SplitItems
+          id={`${formId}-split`}
+          type={type}
+          total={amount}
+          mainPouch={pouchesOfType.find((p) => p.id === categoryId)}
+          pouches={pouchesOfType}
+          transactions={data.transactions}
+          month={monthOf(date)}
+          items={splitItems}
+          onChange={setSplitItems}
+          itemErrors={itemErrors}
+          error={splitError}
+        />
+      )}
 
       <div className="field">
         <label className="field-label" htmlFor={`${formId}-note`}>
@@ -161,7 +205,7 @@ export default function TransactionForm({ initial, returnTo }: TransactionFormPr
 
       <div className={styles.actions}>
         <button type="submit" className="button">
-          {initial ? "Save changes" : "Record entry"}
+          {initial ? "Save changes" : splitItems.length > 0 ? "Record entries" : "Record entry"}
         </button>
         <Link href={returnTo} className="button button-quiet">
           Cancel

@@ -6,6 +6,7 @@ import type { Category, SaveFile, Transaction } from "./types";
 
 export type LedgerAction =
   | { type: "addTransaction"; transaction: Transaction; today: string }
+  | { type: "addTransactions"; transactions: Transaction[]; today: string } // a split payment
   | { type: "updateTransaction"; transaction: Transaction }
   | { type: "deleteTransaction"; id: string }
   | { type: "addCategory"; category: Category }
@@ -21,14 +22,16 @@ export function entriesInPouch(transactions: Transaction[], categoryId: string):
 
 export function ledgerReducer(state: SaveFile, action: LedgerAction): SaveFile {
   switch (action.type) {
-    case "addTransaction": {
+    case "addTransaction":
+    case "addTransactions": {
+      const added = action.type === "addTransaction" ? [action.transaction] : action.transactions;
       // One logbook stamp per day you record something.
       const logbookDays = state.logbookDays.includes(action.today)
         ? state.logbookDays
         : [...state.logbookDays, action.today];
       return {
         ...state,
-        transactions: [...state.transactions, action.transaction],
+        transactions: [...state.transactions, ...added],
         logbookDays,
       };
     }

@@ -3,7 +3,7 @@ import { addDollars, finishAmount, pressKey, pressKeyFresh, type PadKey } from "
 
 // Presses several keys one after another, starting from an empty amount.
 function type(...keys: PadKey[]): string {
-  return keys.reduce(pressKey, "");
+  return keys.reduce((amount, key) => pressKey(amount, key), "");
 }
 
 describe("pressKey", () => {
@@ -45,6 +45,13 @@ describe("pressKey", () => {
     expect(pressKey("9999999", "9")).toBe("9999999");
   });
 
+  it("never goes over a smaller limit, like what's left to split", () => {
+    expect(pressKey("3", "5", 3050)).toBe("3"); // $35 is more than $30.50
+    expect(pressKey("30.", "5", 3050)).toBe("30.5");
+    expect(pressKey("30.5", "1", 3050)).toBe("30.5");
+    expect(pressKey("", "1", 0)).toBe(""); // nothing left
+  });
+
   it("only deletes when the box holds something the pad can't continue", () => {
     expect(pressKey("$12", "5")).toBe("$12");
     expect(pressKey("$12", "back")).toBe("$1");
@@ -66,6 +73,11 @@ describe("addDollars", () => {
     expect(addDollars("999990", 20)).toBe("1000000.00");
   });
 
+  it("stops at a smaller limit, like what's left to split", () => {
+    expect(addDollars("20.00", 20, 3050)).toBe("30.50");
+    expect(addDollars("", 1, 0)).toBe("");
+  });
+
   it("leaves a half-typed or unusual amount alone", () => {
     expect(addDollars("12.", 5)).toBe("12.");
     expect(addDollars("$12", 5)).toBe("$12");
@@ -85,16 +97,35 @@ describe("pressKeyFresh", () => {
   it("types normally once you've started", () => {
     expect(pressKeyFresh("5", "2", false)).toBe("52");
   });
+
+  it("keeps to the limit", () => {
+    expect(pressKeyFresh("5", "2", false, 3050)).toBe("5");
+  });
 });
 
 describe("finishAmount", () => {
-  it("drops a dot left at the end, so the amount can be saved", () => {
-    expect(finishAmount("12.")).toBe("12");
-    expect(finishAmount("0.")).toBe("0");
+  it("shows every amount with its cents, so typed and coin amounts match", () => {
+    expect(finishAmount("5")).toBe("5.00");
+    expect(finishAmount("12.5")).toBe("12.50");
+    expect(finishAmount("12.34")).toBe("12.34");
+    expect(finishAmount("0.5")).toBe("0.50");
   });
 
-  it("leaves a finished amount alone", () => {
-    expect(finishAmount("12.5")).toBe("12.5");
+  it("drops a dot left at the end", () => {
+    expect(finishAmount("12.")).toBe("12.00");
+    expect(finishAmount("0.")).toBe("0"); // $0 can't be saved; the form says so
+  });
+
+  it("leaves an empty or unreadable amount for the form's check", () => {
     expect(finishAmount("")).toBe("");
+    expect(finishAmount("abc")).toBe("abc");
+    expect(finishAmount("1.234")).toBe("1.234");
+  });
+
+  it("brings an amount typed on a computer down to the limit", () => {
+    expect(finishAmount("45", 3050)).toBe("30.50");
+    expect(finishAmount("45", 0)).toBe("");
+    expect(finishAmount("12.5", 3050)).toBe("12.50");
+    expect(finishAmount("abc", 3050)).toBe("abc");
   });
 });
